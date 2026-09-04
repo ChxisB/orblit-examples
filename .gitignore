@@ -1,0 +1,15 @@
+.DS_Store
+.dart_tool/
+.packages
+build/
+pubspec.lock
+*.iml
+
+# Written by tool/link_local.sh for working against sibling checkouts.
+pubspec_overrides.yaml
+
+# Flutter, per platform
+**/macos/Pods/
+**/macos/Podfile.lock
+**/macos/Flutter/ephemeral/
+**/macos/Flutter/GeneratedPluginRegistrant.swift

@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: orbis-examples
+
+      # The engine and networking are separate private repositories, so CI
+      # checks them out and links against them rather than resolving git
+      # dependencies it has no credentials for.
+      - uses: actions/checkout@v4
+        with:
+          repository: Orbis-Engine/orbis
+          path: orbis
+          token: ${{ secrets.ORBIS_ENGINE_TOKEN }}
+      - uses: actions/checkout@v4
+        with:
+          repository: Orbis-Engine/orbis-net
+          path: orbis-net
+          token: ${{ secrets.ORBIS_ENGINE_TOKEN }}
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 3.13.0
+
+      - name: Link local checkouts
+        working-directory: orbis-examples
+        run: ./tool/link_local.sh ../orbis ../orbis-net
+
+      - name: Check
+        working-directory: orbis-examples
+        run: ./tool/check.sh
