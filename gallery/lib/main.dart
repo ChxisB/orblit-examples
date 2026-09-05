@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:orbis_filament/orbis_filament.dart';
 
 import 'src/example.dart';
+import 'src/examples/crowd.dart';
 import 'src/examples/day_and_night.dart';
 import 'src/examples/interface.dart';
 import 'src/examples/lights.dart';
@@ -63,6 +64,7 @@ class _GalleryState extends State<Gallery> with SingleTickerProviderStateMixin {
     WeatherExample(),
     InterfaceExample(),
     ManyExample(),
+    CrowdExample(),
     MeshesExample(),
   ];
 
