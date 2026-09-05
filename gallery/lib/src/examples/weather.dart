@@ -24,7 +24,7 @@ class WeatherExample extends Example {
       'Haze, banks of cloud and falling weather, carried by one wind.';
 
   @override
-  ViewPoint get viewpoint => const ViewPoint(distance: 16, pitch: 0.12);
+  ViewPoint get viewpoint => const ViewPoint(distance: 16, pitch: -0.06, height: 1.5);
 
   String condition = 'Misty';
 
@@ -36,12 +36,15 @@ class WeatherExample extends Example {
   double windBearing = 135;
   double rain = 0;
   double snow = 0;
+  double cover = 0.35;
+  double cloudAltitude = 140;
 
+  // haze, mist, mist size, height, wind, rain, snow, cloud cover
   static const _presets = {
-    'Clear': [0.004, 0.0, 40.0, 0.0, 1.5, 0.0, 0.0],
-    'Misty': [0.055, 0.75, 22.0, -1.5, 2.5, 0.0, 0.0],
-    'Rain': [0.035, 0.35, 70.0, 0.0, 5.0, 0.65, 0.0],
-    'Snow': [0.04, 0.4, 60.0, 0.0, 2.2, 0.0, 0.75],
+    'Clear': [0.004, 0.0, 40.0, 0.0, 1.5, 0.0, 0.0, 0.06],
+    'Misty': [0.055, 0.75, 22.0, -1.5, 2.5, 0.0, 0.0, 0.45],
+    'Rain': [0.035, 0.2, 70.0, 0.0, 5.0, 0.65, 0.0, 0.85],
+    'Snow': [0.04, 0.25, 60.0, 0.0, 2.2, 0.0, 0.75, 0.8],
   };
 
   void _apply(String name) {
@@ -54,6 +57,7 @@ class WeatherExample extends Example {
     windSpeed = preset[4];
     rain = preset[5];
     snow = preset[6];
+    cover = preset[7];
   }
 
   @override
@@ -134,6 +138,18 @@ class WeatherExample extends Example {
               stretch: between(30, 5),
               threshold: between(0.7, 0.55),
             ),
+      // Cloud is a layer overhead rather than anything to do with the fog:
+      // a scene can have either without the other.
+      clouds: OrbisClouds(
+        colour: linearOf(
+          Color.lerp(const Color(0xFFBFC8D2), const Color(0xFF6E7681),
+              cover.clamp(0.0, 1.0))!,
+        ),
+        cover: cover,
+        wind: wind,
+        featureSize: 1 / 320,
+        altitude: cloudAltitude,
+      ),
       camera: camera,
     );
   }
@@ -153,6 +169,29 @@ class WeatherExample extends Example {
           },
         ),
         Setting(
+          label: 'Cloud cover',
+          value: cover,
+          min: 0,
+          max: 1,
+          onChanged: (value) {
+            cover = value;
+            changed();
+          },
+        ),
+        if (cover > 0.01)
+          Setting(
+            label: 'Cloud height',
+            value: cloudAltitude,
+            min: 40,
+            max: 600,
+            unit: ' m',
+            decimals: 0,
+            onChanged: (value) {
+              cloudAltitude = value;
+              changed();
+            },
+          ),
+        Setting(
           label: 'Haze',
           value: density,
           min: 0,
@@ -164,7 +203,7 @@ class WeatherExample extends Example {
           },
         ),
         Setting(
-          label: 'Cloud',
+          label: 'Ground mist',
           value: structure,
           min: 0,
           max: 1,
@@ -175,7 +214,7 @@ class WeatherExample extends Example {
         ),
         if (structure > 0)
           Setting(
-            label: 'Cloud size',
+            label: 'Mist size',
             value: cloudSize,
             min: 4,
             max: 120,
