@@ -27,6 +27,13 @@ dependency_overrides:
     path: $NET
 YAML
 
+cat > gallery/pubspec_overrides.yaml <<YAML
+# Written by tool/link_local.sh. Not committed.
+dependency_overrides:
+  orbis_filament:
+    path: $ENGINE/packages/orbis_filament
+YAML
+
 cat > viewport/pubspec_overrides.yaml <<YAML
 # Written by tool/link_local.sh. Not committed.
 dependency_overrides:
@@ -37,10 +44,13 @@ YAML
 (cd simulation && dart pub get > /dev/null)
 echo "  simulation -> $ENGINE, $NET"
 
-# The viewport is a Flutter app, so it resolves with Flutter rather than Dart.
+# The gallery and the viewport are Flutter apps, so they resolve with Flutter
+# rather than Dart.
 if command -v flutter > /dev/null; then
-  (cd viewport && flutter pub get > /dev/null)
-  echo "  viewport   -> $ENGINE"
+  for app in gallery viewport; do
+    (cd "$app" && flutter pub get > /dev/null)
+    printf '  %-10s -> %s\n' "$app" "$ENGINE"
+  done
 else
-  echo "  viewport   skipped, no flutter on PATH"
+  echo "  gallery, viewport skipped: no flutter on PATH"
 fi
