@@ -7,6 +7,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+SCRIPT=$(cd "${3:-../orbis-script}" 2>/dev/null && pwd) || SCRIPT=""
 ENGINE=$(cd "${1:-../orbis}" 2>/dev/null && pwd) || {
   echo "No engine checkout at ${1:-../orbis}. Clone Orbis-Engine/orbis beside this one."
   exit 1
@@ -32,6 +33,8 @@ cat > gallery/pubspec_overrides.yaml <<YAML
 dependency_overrides:
   orbis_filament:
     path: $ENGINE/packages/orbis_filament
+${SCRIPT:+  orbis_script_ui:
+    path: $SCRIPT/packages/orbis_script_ui}
 YAML
 
 cat > viewport/pubspec_overrides.yaml <<YAML

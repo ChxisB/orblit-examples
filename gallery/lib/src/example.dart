@@ -35,6 +35,12 @@ abstract class Example {
 
   /// The lines that matter, as somebody would write them.
   String get code;
+
+  /// Anything drawn over the scene rather than in it.
+  ///
+  /// Null for the examples that are only about what the renderer does. Call
+  /// [changed] when something in it has moved.
+  Widget? overlay(BuildContext context, VoidCallback changed) => null;
 }
 
 /// Where an example starts looking from.

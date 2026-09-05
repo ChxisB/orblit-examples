@@ -40,6 +40,14 @@ dependencies:
       path: packages/orbis_filament
       ref: master
 
+  # The interface layer, from the scripting runtime's repository: a
+  # description styled with utility classes or CSS, built as real widgets.
+  orbis_script_ui:
+    git:
+      url: git@github.com:Orbis-Engine/orbis-script.git
+      path: packages/orbis_script_ui
+      ref: master
+
   vector_math: ^2.1.4
 
   # The following adds the Cupertino Icons font to your application.

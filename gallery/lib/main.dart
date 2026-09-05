@@ -9,6 +9,7 @@ import 'package:orbis_filament/orbis_filament.dart';
 
 import 'src/example.dart';
 import 'src/examples/day_and_night.dart';
+import 'src/examples/interface.dart';
 import 'src/examples/lights.dart';
 import 'src/examples/many.dart';
 import 'src/examples/meshes.dart';
@@ -60,6 +61,7 @@ class _GalleryState extends State<Gallery> with SingleTickerProviderStateMixin {
     LightsExample(),
     DayAndNightExample(),
     WeatherExample(),
+    InterfaceExample(),
     ManyExample(),
     MeshesExample(),
   ];
@@ -140,7 +142,22 @@ class _GalleryState extends State<Gallery> with SingleTickerProviderStateMixin {
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: available ? _stage() : const _Unavailable(),
+                      child: Stack(
+                        children: [
+                          Positioned.fill(
+                            child:
+                                available ? _stage() : const _Unavailable(),
+                          ),
+                          // Whatever the example draws over its scene, which
+                          // for most of them is nothing.
+                          if (_showing.overlay(
+                                context,
+                                () => setState(() {}),
+                              )
+                              case final over?)
+                            Positioned.fill(child: over),
+                        ],
+                      ),
                     ),
                   ),
                 ),
