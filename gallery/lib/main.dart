@@ -89,12 +89,25 @@ class _GalleryState extends State<Gallery> with SingleTickerProviderStateMixin {
   /// wall time, so opening one always starts it at the beginning — a day
   /// cycle that began four minutes ago in another example is not a day cycle
   /// anybody asked to watch from the middle.
-  late final Ticker _clock = createTicker(_tick)..start();
+  /// Started in initState rather than declared with an initialiser.
+  ///
+  /// A `late final` field is built the first time it is read, and nothing
+  /// here ever read this one — so the ticker was never created and never
+  /// started. Everything the examples animate from Dart was frozen at zero,
+  /// and it did not show because the sky and the rain run off the renderer's
+  /// own clock and carried on moving regardless.
+  Ticker? _clock;
   Duration _startedAt = Duration.zero;
   bool _restarting = true;
   double _seconds = 0;
 
   Offset? _dragging;
+
+  @override
+  void initState() {
+    super.initState();
+    _clock = createTicker(_tick)..start();
+  }
 
   void _tick(Duration elapsed) {
     if (_restarting) {
@@ -115,7 +128,7 @@ class _GalleryState extends State<Gallery> with SingleTickerProviderStateMixin {
 
   @override
   void dispose() {
-    _clock.dispose();
+    _clock?.dispose();
     super.dispose();
   }
 

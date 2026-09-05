@@ -39,6 +39,7 @@ class WeatherExample extends Example {
   double cover = 0.38;
   double cloudAltitude = 900;
   String shape = 'Cumulus';
+  double lightning = 0;
 
   /// The shapes on offer, each a real one rather than a preset of the same
   /// one: they differ in how high the base sits, how deep the layer is, how
@@ -56,6 +57,7 @@ class WeatherExample extends Example {
   static const _presets = {
     'Clear': [0.004, 0.0, 40.0, 0.0, 1.5, 0.0, 0.0, 0.06],
     'Fair': [0.006, 0.05, 50.0, 0.0, 4.0, 0.0, 0.0, 0.38],
+    'Storm': [0.07, 0.9, 45.0, 0.0, 12.0, 0.95, 0.0, 1.0],
     'Misty': [0.055, 0.75, 22.0, -1.5, 2.5, 0.0, 0.0, 0.45],
     'Rain': [0.035, 0.2, 70.0, 0.0, 5.0, 0.65, 0.0, 0.85],
     'Snow': [0.04, 0.25, 60.0, 0.0, 2.2, 0.0, 0.75, 0.8],
@@ -72,6 +74,11 @@ class WeatherExample extends Example {
     rain = preset[5];
     snow = preset[6];
     cover = preset[7];
+    lightning = name == 'Storm' ? 0.85 : 0;
+    if (name == 'Storm') {
+      shape = 'Cumulonimbus';
+      cloudAltitude = OrbisClouds.cumulonimbus().altitude;
+    }
   }
 
   @override
@@ -82,6 +89,8 @@ class WeatherExample extends Example {
     final falling = rain + snow;
     final asSnow = falling <= 0 ? 0.0 : (snow / falling).clamp(0.0, 1.0);
     double between(double wet, double white) => wet + (white - wet) * asSnow;
+
+    final strike = OrbisStrike.at(seconds, lightning);
 
     return OrbisScene(
       objects: [
@@ -133,6 +142,11 @@ class WeatherExample extends Example {
         bodyDirection: Vector3(0.42, 0.36, 0.52)..normalize(),
         bodyColour: linearOf(const Color(0xFFFFF6E8)),
         bodySize: 0.011,
+        // Worked out from the clock rather than rolled, so the same second
+        // of the same storm strikes the same way twice.
+        flash: strike.flash,
+        flashDirection: strike.direction,
+        flashSeed: strike.seed,
         // Cloud is a layer overhead rather than anything to do with the fog:
         // a scene can have either without the other.
         clouds: cover <= 0.01
@@ -186,6 +200,16 @@ class WeatherExample extends Example {
           selected: condition,
           onSelect: (option) {
             _apply(option);
+            changed();
+          },
+        ),
+        Setting(
+          label: 'Lightning',
+          value: lightning,
+          min: 0,
+          max: 1,
+          onChanged: (value) {
+            lightning = value;
             changed();
           },
         ),
