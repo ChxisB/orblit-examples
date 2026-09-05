@@ -27,9 +27,16 @@ class DayAndNightExample extends Example {
   @override
   ViewPoint get viewpoint => const ViewPoint(distance: 14, pitch: 0.18);
 
-  double hour = 7.5;
+  double hour = 10;
   bool running = true;
   double hoursPerSecond = 0.6;
+  double cover = 0.4;
+
+  static Vector3 _mix(Vector3 from, Vector3 to, double t) => Vector3(
+    from.x + (to.x - from.x) * t,
+    from.y + (to.y - from.y) * t,
+    from.z + (to.z - from.z) * t,
+  );
 
   @override
   OrbisScene scene(OrbisCamera camera, double seconds) {
@@ -58,6 +65,23 @@ class DayAndNightExample extends Example {
     final ambient = math.max(0.2, lux * 0.35);
 
     final incident = lux * math.max(0, math.sin(altitude)) + ambient;
+
+    final bodyColour = linearOf(
+      isDay
+          ? Color.lerp(
+              const Color(0xFFFF8A3D),
+              const Color(0xFFFFF4E5),
+              (swing / 0.18).clamp(0.0, 1.0),
+            )!
+          : const Color(0xFFC3D4FF),
+    );
+
+    // Deep overhead and pale along the ground, and the lower the body sits
+    // the more the horizon takes its colour — which is the whole of a
+    // sunset. Worked out from where the body actually is, so it happens on
+    // both sides of the day without either being written down.
+    final flat = linearOf(_skyAt(swing));
+    final glow = (1 - altitude / 0.45).clamp(0.0, 1.0);
 
     return OrbisScene(
       objects: [
@@ -91,15 +115,7 @@ class DayAndNightExample extends Example {
           // Light travels from the body towards the scene, which is the way
           // the body is not.
           direction: -toBody..normalize(),
-          colour: linearOf(
-            isDay
-                ? Color.lerp(
-                    const Color(0xFFFF8A3D),
-                    const Color(0xFFFFF4E5),
-                    (swing / 0.18).clamp(0.0, 1.0),
-                  )!
-                : const Color(0xFFC3D4FF),
-          ),
+          colour: bodyColour,
           sunAngularRadius: 0.53,
           // A wide soft halo reads as a sun through air; a tight one reads as
           // a moon on a clear night. It is most of what tells them apart.
@@ -107,7 +123,23 @@ class DayAndNightExample extends Example {
           haloFalloff: isDay ? 70 : 240,
         ),
       ],
-      sky: OrbisSky(colour: linearOf(_skyAt(swing)), ambient: ambient),
+      sky: OrbisSky(
+        colour: flat,
+        zenith: flat.clone()..scale(0.82),
+        horizon: _mix(
+          _mix(flat, Vector3(0.72, 0.80, 0.92), 0.28),
+          bodyColour,
+          glow * 0.55,
+        ),
+        ambient: ambient,
+        // The same direction the light comes from, which is why the cloud
+        // lights up on the side the sun is on and goes to shadow on the
+        // other — through the whole day, without either being drawn.
+        bodyDirection: toBody,
+        bodyColour: bodyColour.clone()..scale(isDay ? 1.0 : 0.30),
+        bodySize: 0.011,
+        clouds: OrbisClouds.cumulus(cover: cover, wind: Vector2(5, 2)),
+      ),
       camera: _metered(camera, incident),
     );
   }
@@ -181,6 +213,16 @@ class DayAndNightExample extends Example {
           max: 24,
           onChanged: (value) {
             hour = value;
+            changed();
+          },
+        ),
+        Setting(
+          label: 'Cloud cover',
+          value: cover,
+          min: 0,
+          max: 1,
+          onChanged: (value) {
+            cover = value;
             changed();
           },
         ),

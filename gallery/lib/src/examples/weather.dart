@@ -26,22 +26,36 @@ class WeatherExample extends Example {
   @override
   ViewPoint get viewpoint => const ViewPoint(distance: 16, pitch: -0.06, height: 1.5);
 
-  String condition = 'Misty';
+  String condition = 'Fair';
 
-  double density = 0.055;
-  double structure = 0.75;
-  double cloudSize = 22;
-  double height = -1.5;
-  double windSpeed = 2.5;
+  double density = 0.006;
+  double structure = 0.05;
+  double cloudSize = 50;
+  double height = 0;
+  double windSpeed = 4;
   double windBearing = 135;
   double rain = 0;
   double snow = 0;
-  double cover = 0.35;
-  double cloudAltitude = 140;
+  double cover = 0.38;
+  double cloudAltitude = 900;
+  String shape = 'Cumulus';
+
+  /// The shapes on offer, each a real one rather than a preset of the same
+  /// one: they differ in how high the base sits, how deep the layer is, how
+  /// large its lumps are, and how far the noise is folded.
+  static final _shapes =
+      <String, OrbisClouds Function({double cover, Vector2? wind})>{
+    'Cumulus': OrbisClouds.cumulus,
+    'Stratocumulus': OrbisClouds.stratocumulus,
+    'Stratus': OrbisClouds.stratus,
+    'Cirrus': OrbisClouds.cirrus,
+    'Cumulonimbus': OrbisClouds.cumulonimbus,
+  };
 
   // haze, mist, mist size, height, wind, rain, snow, cloud cover
   static const _presets = {
     'Clear': [0.004, 0.0, 40.0, 0.0, 1.5, 0.0, 0.0, 0.06],
+    'Fair': [0.006, 0.05, 50.0, 0.0, 4.0, 0.0, 0.0, 0.38],
     'Misty': [0.055, 0.75, 22.0, -1.5, 2.5, 0.0, 0.0, 0.45],
     'Rain': [0.035, 0.2, 70.0, 0.0, 5.0, 0.65, 0.0, 0.85],
     'Snow': [0.04, 0.25, 60.0, 0.0, 2.2, 0.0, 0.75, 0.8],
@@ -101,12 +115,31 @@ class WeatherExample extends Example {
           kind: OrbisLightKind.directional,
           // Dimmer than a clear day, because there is cloud in the way of it.
           intensity: 30000,
-          direction: Vector3(-0.35, -0.8, -0.5)..normalize(),
+          direction: Vector3(-0.42, -0.36, -0.52)..normalize(),
           colour: linearOf(const Color(0xFFEFEFEA)),
           sunAngularRadius: 6,
         ),
       ],
-      sky: OrbisSky(colour: linearOf(const Color(0xFF6E757D)), ambient: 22000),
+      // The sky, the body in it and the cloud are one object because they
+      // are one shader on one dome: the cloud covers the sun, the sun lights
+      // the cloud, and a strike would light both.
+      sky: OrbisSky(
+        colour: linearOf(const Color(0xFF6E757D)),
+        zenith: linearOf(const Color(0xFF3E6FA8)),
+        horizon: linearOf(const Color(0xFFBCCBD8)),
+        ambient: 22000,
+        // The way the light comes from, which is the way the light goes, the
+        // other way round.
+        bodyDirection: Vector3(0.42, 0.36, 0.52)..normalize(),
+        bodyColour: linearOf(const Color(0xFFFFF6E8)),
+        bodySize: 0.011,
+        // Cloud is a layer overhead rather than anything to do with the fog:
+        // a scene can have either without the other.
+        clouds: cover <= 0.01
+            ? OrbisClouds.none
+            : _shapes[shape]!(cover: cover, wind: wind)
+                .copyWith(altitude: cloudAltitude),
+      ),
       fog: OrbisFog(
         colour: linearOf(const Color(0xFFD3D8DD)),
         density: density,
@@ -138,18 +171,6 @@ class WeatherExample extends Example {
               stretch: between(30, 5),
               threshold: between(0.7, 0.55),
             ),
-      // Cloud is a layer overhead rather than anything to do with the fog:
-      // a scene can have either without the other.
-      clouds: OrbisClouds(
-        colour: linearOf(
-          Color.lerp(const Color(0xFFBFC8D2), const Color(0xFF6E7681),
-              cover.clamp(0.0, 1.0))!,
-        ),
-        cover: cover,
-        wind: wind,
-        featureSize: 1 / 320,
-        altitude: cloudAltitude,
-      ),
       camera: camera,
     );
   }
@@ -178,6 +199,17 @@ class WeatherExample extends Example {
             changed();
           },
         ),
+        if (cover > 0.01)
+          Choice(
+            label: 'Cloud shape',
+            options: _shapes.keys.toList(),
+            selected: shape,
+            onSelect: (option) {
+              shape = option;
+              cloudAltitude = _shapes[option]!().altitude;
+              changed();
+            },
+          ),
         if (cover > 0.01)
           Setting(
             label: 'Cloud height',
