@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:orbis_filament/orbis_filament.dart';
+import 'package:orbis_script/orbis_script.dart';
 
 import 'src/example.dart';
+import 'src/examples/benchmark.dart';
 import 'src/examples/cameras.dart';
 import 'src/examples/crowd.dart';
 import 'src/examples/day_and_night.dart';
@@ -19,6 +21,26 @@ import 'src/examples/meshes.dart';
 import 'src/examples/spawning.dart';
 import 'src/examples/surface.dart';
 import 'src/examples/weather.dart';
+
+/// Every example the gallery shows, in the order it shows them.
+///
+/// A function rather than a field on the app, so that a test can ask for the
+/// same list rather than keeping a copy of it — a copy is how a test ends up
+/// passing for an example nobody can reach.
+List<Example> galleryExamples() => [
+  SurfaceExample(),
+  LightsExample(),
+  DayAndNightExample(),
+  WeatherExample(),
+  InterfaceExample(),
+  NativeInterfaceExample(),
+  SpawningExample(),
+  ManyExample(),
+  CrowdExample(),
+  CamerasExample(),
+  MeshesExample(),
+  BenchmarkExample(),
+];
 
 void main() => runApp(const GalleryApp());
 
@@ -60,19 +82,7 @@ class Gallery extends StatefulWidget {
 }
 
 class _GalleryState extends State<Gallery> with SingleTickerProviderStateMixin {
-  late final List<Example> _examples = [
-    SurfaceExample(),
-    LightsExample(),
-    DayAndNightExample(),
-    WeatherExample(),
-    InterfaceExample(),
-    NativeInterfaceExample(),
-    SpawningExample(),
-    ManyExample(),
-    CrowdExample(),
-    CamerasExample(),
-    MeshesExample(),
-  ];
+  late final List<Example> _examples = galleryExamples();
 
   /// Which one to open on.
   ///
@@ -115,6 +125,17 @@ class _GalleryState extends State<Gallery> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     _clock = createTicker(_tick)..start();
+
+    // Warm the script engine, after the first frame rather than during it.
+    //
+    // Loading the native library costs a quarter of a second, once for the
+    // life of the process; a host after that costs a fifth of a millisecond.
+    // Paid here, nobody sees it. Paid when somebody opens the first example
+    // that uses script, it is a quarter-second stall on the example rather
+    // than on the engine — which is the same thing to look at.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ScriptHost().dispose();
+    });
   }
 
   void _tick(Duration elapsed) {
@@ -209,6 +230,12 @@ class _GalleryState extends State<Gallery> with SingleTickerProviderStateMixin {
         onPanEnd: (_) => _dragging = null,
         child: OrbisView(
           scene: _showing.scene(_camera.toRenderCamera(), _seconds),
+          onViewport: (id) {
+            // The benchmark asks the renderer what a frame costs, and only
+            // the view knows which viewport it is.
+            final example = _showing;
+            if (example is BenchmarkExample) example.watch(id);
+          },
           onSceneNotes: (notes) {
             // Only one example has anything to say about a file it could not
             // load; the rest have nothing to report and nowhere to put it.

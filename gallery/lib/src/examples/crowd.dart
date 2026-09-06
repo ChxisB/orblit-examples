@@ -40,9 +40,17 @@ class CrowdExample extends Example {
   ViewPoint get viewpoint =>
       const ViewPoint(distance: 190, pitch: 0.34, height: 6);
 
+  // What is drawn, and what the sliders are showing.
+  //
+  // Two of each, because laying a hundred thousand members out takes fifty
+  // milliseconds and a slider reports every pixel of a drag. Rebuilding on
+  // each report is eighteen frames a second while dragging — so the drawn
+  // numbers only catch up when the handle is let go.
   double count = 100000;
+  double wantedCount = 100000;
   bool drifting = false;
   double spread = 700;
+  double wantedSpread = 700;
   double range = 300;
 
   /// The buffers, kept rather than rebuilt.
@@ -242,23 +250,31 @@ class CrowdExample extends Example {
       children: [
         Setting(
           label: 'Members',
-          value: count,
+          value: wantedCount,
           min: 1000,
           max: 100000,
           decimals: 0,
           onChanged: (value) {
+            wantedCount = value;
+            changed();
+          },
+          onSettled: (value) {
             count = value;
             changed();
           },
         ),
         Setting(
           label: 'Spread',
-          value: spread,
+          value: wantedSpread,
           min: 40,
           max: 2000,
           decimals: 0,
           unit: ' m',
           onChanged: (value) {
+            wantedSpread = value;
+            changed();
+          },
+          onSettled: (value) {
             spread = value;
             changed();
           },

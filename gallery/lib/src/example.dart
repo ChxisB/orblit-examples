@@ -113,6 +113,7 @@ class Setting extends StatelessWidget {
     required this.min,
     required this.max,
     required this.onChanged,
+    this.onSettled,
     this.unit = '',
     this.decimals = 2,
   });
@@ -122,6 +123,13 @@ class Setting extends StatelessWidget {
   final double min;
   final double max;
   final ValueChanged<double> onChanged;
+
+  /// Called once, when the handle is let go.
+  ///
+  /// For the settings whose answer is expensive. A slider reports every pixel
+  /// of a drag, and something that lays a hundred thousand objects out again
+  /// each time it hears one is a slider that cannot be dragged.
+  final ValueChanged<double>? onSettled;
   final String unit;
   final int decimals;
 
@@ -147,6 +155,7 @@ class Setting extends StatelessWidget {
                 min: min,
                 max: max,
                 onChanged: onChanged,
+                onChangeEnd: onSettled,
               ),
             ),
           ),
