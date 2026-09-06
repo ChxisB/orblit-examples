@@ -18,6 +18,8 @@ import 'src/examples/interface_native.dart';
 import 'src/examples/lights.dart';
 import 'src/examples/many.dart';
 import 'src/examples/meshes.dart';
+import 'src/examples/materials.dart';
+import 'src/examples/post.dart';
 import 'src/examples/spawning.dart';
 import 'src/examples/surface.dart';
 import 'src/examples/weather.dart';
@@ -39,6 +41,8 @@ List<Example> galleryExamples() => [
   CrowdExample(),
   CamerasExample(),
   MeshesExample(),
+  MaterialsExample(),
+  PostExample(),
   BenchmarkExample(),
 ];
 
