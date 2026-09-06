@@ -42,8 +42,8 @@ class CrowdExample extends Example {
 
   double count = 100000;
   bool drifting = false;
-  double spread = 1500;
-  double range = 350;
+  double spread = 700;
+  double range = 300;
 
   /// The buffers, kept rather than rebuilt.
   ///
@@ -117,6 +117,18 @@ class CrowdExample extends Example {
           sunAngularRadius: 0.6,
         ),
       ],
+      // Air, so that the far end of the field goes into the distance rather
+      // than stopping at a line. A range without it is honest but obvious:
+      // the members sink, and what they sink into is a hard horizon.
+      fog: OrbisFog(
+        colour: linearOf(const Color(0xFFB9CBDD)),
+        density: 0.0038,
+        // Not right in front of the lens: the thing being looked at should be
+        // seen, and only what is far away should be veiled.
+        distance: 30,
+        // All the way, so the far edge of the ground is not a line.
+        maximumOpacity: 1,
+      ),
       sky: OrbisSky(
         colour: linearOf(const Color(0xFF6E8DB4)),
         zenith: linearOf(const Color(0xFF2F5F97)),
