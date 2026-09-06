@@ -13,3 +13,8 @@ pubspec_overrides.yaml
 **/macos/Podfile.lock
 **/macos/Flutter/ephemeral/
 **/macos/Flutter/GeneratedPluginRegistrant.swift
+
+# The TypeScript toolchain. Needed to change the script in gallery/script,
+# not to run the examples — what they load is checked in.
+node_modules/
+gallery/script/build/

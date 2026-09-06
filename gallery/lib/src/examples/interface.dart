@@ -1,19 +1,24 @@
+import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:orbis_filament/orbis_filament.dart';
+import 'package:orbis_script/orbis_script.dart';
 import 'package:orbis_script_ui/orbis_script_ui.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
 
 import '../example.dart';
+import 'hud_script.g.dart';
 import 'surface.dart' show linearOf;
 
-/// An interface over a running scene, described rather than built.
+/// An interface over a running scene, written in TypeScript.
 ///
-/// The description below is exactly what a TypeScript file would send: a tree
-/// of elements with a class list on each. Dart builds real Flutter widgets
-/// from it — laid out by Flutter, drawn by Impeller — so the borrowed
-/// vocabulary is a way in rather than a second box model.
+/// `script/hud.tsx` is the whole of it: components, props, JSX. It is compiled
+/// by `npm run build`, loaded into the engine's own script host, and asked to
+/// describe the interface; Dart builds real Flutter widgets from what comes
+/// back — laid out by Flutter, drawn by Impeller. The borrowed class-name
+/// vocabulary is a way in rather than a second box model pretending to be the
+/// web's.
 class InterfaceExample extends Example {
   InterfaceExample();
 
@@ -27,122 +32,88 @@ class InterfaceExample extends Example {
   @override
   ViewPoint get viewpoint => const ViewPoint(distance: 12, pitch: 0.22);
 
-  double health = 0.72;
-  int score = 1840;
-  bool showPanel = true;
-  String accent = 'ember';
+  // The script owns these, not this class.
+  //
+  // That is the whole point rather than a detail of the wiring: a HUD written
+  // in TypeScript keeps its own state, and a button in it changes that state
+  // without asking Dart. Holding a copy here and pushing it in before every
+  // render would overwrite whatever the script had just done — which it did,
+  // and the button appeared to do nothing.
+  double get health => _number('hull');
+  set health(double value) => _write('hull', '$value');
 
-  /// What arrives from script. Written here as the description itself so the
-  /// example has no virtual machine in it — the shape is the shape either
-  /// way, which is the point of a description.
-  UiNode get description => UiNode(
-        type: 'stack',
-        classes: 'full',
+  int get score => _number('score').round();
+  set score(int value) => _write('score', '$value');
+
+  bool get showPanel => _read('panel') == 'true';
+  set showPanel(bool value) => _write('panel', '$value');
+
+  String get accent => _read('accent');
+  set accent(String value) => _write('accent', jsonEncode(value));
+
+  String _read(String name) =>
+      host.eval('String(require("hud").state.$name)');
+
+  double _number(String name) => double.tryParse(_read(name)) ?? 0;
+
+  void _write(String name, String value) =>
+      host.eval('require("hud").state.$name = $value;');
+
+  /// The engine running the example's own TypeScript.
+  ///
+  /// Not a description written in Dart that stands in for one: this is
+  /// [hudScript] — the compiled output of `script/hud.tsx` — in QuickJS, asked
+  /// to describe the interface after every change.
+  ScriptHost? _host;
+
+  ScriptHost get host {
+    final running = _host;
+    if (running != null) return running;
+
+    final started = ScriptHost()
+      // The interface library first: the elements, both JSX factories, and the
+      // small module registry that lets a file compiled straight from
+      // TypeScript run without being bundled.
+      ..eval(UiRuntime.source, fileName: 'orbis/ui.js');
+
+    // Then the game's own file, kept under a name so that what it exports can
+    // be reached: its state lives in a module, and the settings write into it.
+    started.eval(
+      ScriptModule.around(hudScript, name: 'hud'),
+      fileName: 'script/hud.tsx',
+    );
+
+    return _host = started;
+  }
+
+  /// What the interface looks like now.
+  ///
+  /// Asked of the script, every time. Nothing on this side builds an element,
+  /// and nothing on this side holds the state it is built from.
+  UiNode get description {
+    try {
+      return UiNode.decode(host.eval('__orbis_ui.render()'));
+    } on ScriptError catch (error) {
+      // A script that stops should say so where somebody can read it, rather
+      // than leaving a blank corner of the screen and no reason for it.
+      return UiNode(
+        type: 'column',
+        classes: 'p-4 gap-2 m-5 rounded-lg bg-rose-900 border border-rose-600',
         children: [
+          const UiNode(
+            type: 'text',
+            classes: 'text-sm font-semibold text-rose-100',
+            text: 'The interface script stopped',
+          ),
           UiNode(
-            type: 'column',
-            classes: 'p-5 gap-3 items-start top-0 left-0',
-            children: [
-              UiNode(
-                type: 'row',
-                classes: 'gap-3 items-center px-4 py-3 rounded-lg '
-                    'bg-slate-900 border border-slate-700 shadow',
-                css: 'opacity: 0.94',
-                children: [
-                  UiNode(
-                    type: 'box',
-                    classes: 'w-3 h-3 rounded-full bg-$accent-500',
-                  ),
-                  UiNode(
-                    type: 'text',
-                    classes: 'text-lg font-semibold text-slate-100',
-                    text: 'Sector 12',
-                  ),
-                  UiNode(
-                    type: 'text',
-                    classes: 'text-sm text-slate-400',
-                    text: '· holding',
-                  ),
-                ],
-              ),
-              UiNode(
-                type: 'column',
-                classes: 'gap-2 px-4 py-3 rounded-lg bg-slate-900 '
-                    'border border-slate-700 w-64',
-                css: 'opacity: 0.94',
-                children: [
-                  UiNode(
-                    type: 'row',
-                    classes: 'justify-between items-center',
-                    children: [
-                      const UiNode(
-                        type: 'text',
-                        classes: 'text-xs uppercase text-slate-400',
-                        text: 'Hull',
-                      ),
-                      UiNode(
-                        type: 'text',
-                        classes: 'text-xs text-slate-300',
-                        text: '${(health * 100).round()}%',
-                      ),
-                    ],
-                  ),
-                  // A bar is two boxes: the track, and as much of it as is
-                  // left. No progress widget, no second component set.
-                  UiNode(
-                    type: 'box',
-                    classes: 'w-full h-2 rounded-full bg-slate-700 clip',
-                    children: [
-                      UiNode(
-                        type: 'box',
-                        classes: 'h-2 rounded-full bg-$accent-500',
-                        css: 'width: ${(health * 224).round()}px',
-                      ),
-                    ],
-                  ),
-                  UiNode(
-                    type: 'row',
-                    classes: 'justify-between items-baseline pt-1',
-                    children: [
-                      const UiNode(
-                        type: 'text',
-                        classes: 'text-xs uppercase text-slate-400',
-                        text: 'Score',
-                      ),
-                      UiNode(
-                        type: 'text',
-                        classes: 'text-2xl font-semibold text-slate-100',
-                        text: '$score',
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              if (showPanel)
-                UiNode(
-                  type: 'row',
-                  classes: 'gap-2',
-                  children: [
-                    UiNode(
-                      type: 'button',
-                      classes: 'px-3 py-2 rounded-md bg-$accent-500 '
-                          'text-white text-sm font-medium',
-                      text: 'Repair',
-                      props: const {'onPressed': 'repair'},
-                    ),
-                    const UiNode(
-                      type: 'button',
-                      classes: 'px-3 py-2 rounded-md bg-slate-800 '
-                          'border border-slate-600 text-slate-200 text-sm',
-                      text: 'Take damage',
-                      props: {'onPressed': 'damage'},
-                    ),
-                  ],
-                ),
-            ],
+            type: 'text',
+            classes: 'text-xs text-rose-200',
+            text: error.message,
           ),
         ],
       );
+    }
+  }
 
   @override
   OrbisScene scene(OrbisCamera camera, double seconds) {
@@ -247,33 +218,39 @@ class InterfaceExample extends Example {
 
   @override
   String get code => '''
-// TypeScript describes the tree. Dart builds the real widgets.
-import { column, row, box, text, button, mount } from "@orbis/ui";
+// script/hud.tsx — the whole of the interface. Compiled by `npm run build`
+// and loaded into the engine's script host; nothing on the Dart side builds
+// an element.
 
-mount(() =>
-  column({ class: "p-5 gap-3 items-start" },
-    row({ class: "gap-3 items-center px-4 py-3 rounded-lg bg-slate-900 " +
-                 "border border-slate-700 shadow", style: "opacity: 0.94" },
-      box({ class: "w-3 h-3 rounded-full bg-ember-500" }),
-      text("Sector 12", { class: "text-lg font-semibold text-slate-100" }),
-    ),
+import { mount } from "orbis";
 
-    // A bar is two boxes: the track, and as much of it as is left.
-    box({ class: "w-full h-2 rounded-full bg-slate-700 clip" },
-      box({ class: "h-2 rounded-full bg-ember-500",
-            style: `width: \${health * 224}px` }),
-    ),
+const state = { hull: 0.72, score: 1840, accent: "ember" };
 
-    button("Repair", {
-      class: "px-3 py-2 rounded-md bg-ember-500 text-white text-sm",
-      onPressed: () => { health = Math.min(1, health + 0.15); },
-    }),
-  ),
-);
+/// A bar is two boxes: the track, and as much of it as is left. No progress
+/// widget, and no second component set.
+function Bar({ part }: { part: number }) {
+  return (
+    <box class="w-full h-2 rounded-full bg-slate-700 clip">
+      <box class={`h-2 rounded-full bg-\${state.accent}-500`}
+           style={`width: \${Math.round(part * 224)}px`} />
+    </box>
+  );
+}
 
-// Classes and CSS resolve to the same style, and CSS is laid over the class
-// list rather than replacing it. A class nobody knows is ignored, not fatal.
-// A callback crosses as a name: the function stays in the script, and
-// pressing something sends the name back and asks for the tree again.
+function Hud() {
+  return (
+    <column class="p-5 gap-3 items-start">
+      <text class="text-lg font-semibold text-slate-100">Sector 12</text>
+      <Bar part={state.hull} />
+      <button class="px-3 py-2 rounded-md bg-ember-500 text-white"
+              key="repair"
+              onPressed={() => { state.hull = Math.min(1, state.hull + 0.12); }}>
+        Repair
+      </button>
+    </column>
+  );
+}
+
+mount(() => <Hud />);
 ''';
 }

@@ -39,7 +39,9 @@ dependency_overrides:
     path: $ENGINE/packages/orbis_light
   orbis_weather:
     path: $ENGINE/packages/orbis_weather
-${SCRIPT:+  orbis_script_ui:
+${SCRIPT:+  orbis_script:
+    path: $SCRIPT/packages/orbis_script
+  orbis_script_ui:
     path: $SCRIPT/packages/orbis_script_ui}
 YAML
 

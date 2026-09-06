@@ -1,0 +1,12 @@
+{
+  "name": "orbis-examples-script",
+  "private": true,
+  "description": "The TypeScript in the examples. A game's own script is built exactly like this: compile it, and hand the result to the engine's script host.",
+  "scripts": {
+    "build": "tsc -p gallery/script/tsconfig.json && cd gallery && dart run tool/embed_script.dart",
+    "check": "tsc -p gallery/script/tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

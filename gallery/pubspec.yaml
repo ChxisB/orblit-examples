@@ -59,6 +59,14 @@ dependencies:
 
   # The interface layer, from the scripting runtime's repository: a
   # description styled with utility classes or CSS, built as real widgets.
+  # The scripting runtime itself — QuickJS, built as a native asset. The
+  # interface example loads real compiled TypeScript into it.
+  orbis_script:
+    git:
+      url: git@github.com:Orbis-Engine/orbis-script.git
+      path: packages/orbis_script
+      ref: master
+
   orbis_script_ui:
     git:
       url: git@github.com:Orbis-Engine/orbis-script.git

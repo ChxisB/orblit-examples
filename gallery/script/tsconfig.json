@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "strict": true,
+    "lib": ["ES2020"],
+    "outDir": "build",
+
+    // Only what is in here decides the shape of the output. Without it the
+    // compiler roots the output at whatever the inputs have in common, which
+    // reaches outside this folder and buries the result several directories
+    // down.
+    "rootDir": ".",
+
+    // No factory imported in any file: the compiler inserts the call itself.
+    "jsx": "react-jsx",
+    "jsxImportSource": "orbis",
+
+    // The engine's interface library, by its types rather than its sources.
+    // A published engine would ship these as an npm package and this would be
+    // one line; until then it is the sibling checkout that tool/link_local.sh
+    // already assumes. Pointing at the sources instead would pull them into
+    // this build and recompile a library the engine already carries.
+    "baseUrl": ".",
+    "paths": {
+      "orbis": ["../../../orbis-script/packages/orbis_script_ui/types/ui"],
+      "orbis/jsx-runtime": [
+        "../../../orbis-script/packages/orbis_script_ui/types/jsx-runtime"
+      ]
+    }
+  },
+  "include": [
+    "*.tsx",
+    "*.ts",
+    "../../../orbis-script/packages/orbis_script_ui/types/jsx.d.ts"
+  ]
+}
