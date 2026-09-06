@@ -43,6 +43,14 @@ dependencies:
   # What the air is doing, and what is above it. Its own package because
   # nothing in it draws anything or knows what a renderer is — a game running
   # on a console has the same weather as one running in the editor.
+  # Cameras as shots rather than as objects: a scene holds as many as it has
+  # situations, and the brain picks between them.
+  orbis_camera:
+    git:
+      url: git@github.com:Orbis-Engine/orbis.git
+      path: packages/orbis_camera
+      ref: master
+
   orbis_weather:
     git:
       url: git@github.com:Orbis-Engine/orbis.git

@@ -31,6 +31,8 @@ YAML
 cat > gallery/pubspec_overrides.yaml <<YAML
 # Written by tool/link_local.sh. Not committed.
 dependency_overrides:
+  orbis_camera:
+    path: $ENGINE/packages/orbis_camera
   orbis_filament:
     path: $ENGINE/packages/orbis_filament
   orbis_light:
