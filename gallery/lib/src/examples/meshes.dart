@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:orbis_filament/orbis_filament.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
@@ -28,7 +30,7 @@ class MeshesExample extends Example {
   /// Left empty on purpose: there is no model in this repository to ship, and
   /// a path that only works on one machine is worse than a field that says
   /// what it wants.
-  String path = '';
+  String path = Platform.environment['ORBIS_MESH'] ?? '';
 
   double copies = 3;
   bool spinning = true;
