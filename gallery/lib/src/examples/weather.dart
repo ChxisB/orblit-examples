@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:orbis_filament/orbis_filament.dart';
+import 'package:orbis_weather/orbis_weather.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
 
 import '../example.dart';
@@ -90,7 +91,7 @@ class WeatherExample extends Example {
     final asSnow = falling <= 0 ? 0.0 : (snow / falling).clamp(0.0, 1.0);
     double between(double wet, double white) => wet + (white - wet) * asSnow;
 
-    final strike = OrbisStrike.at(seconds, lightning);
+    final strike = Strike.at(seconds, lightning);
 
     return OrbisScene(
       objects: [

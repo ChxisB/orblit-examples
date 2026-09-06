@@ -33,6 +33,10 @@ cat > gallery/pubspec_overrides.yaml <<YAML
 dependency_overrides:
   orbis_filament:
     path: $ENGINE/packages/orbis_filament
+  orbis_light:
+    path: $ENGINE/packages/orbis_light
+  orbis_weather:
+    path: $ENGINE/packages/orbis_weather
 ${SCRIPT:+  orbis_script_ui:
     path: $SCRIPT/packages/orbis_script_ui}
 YAML

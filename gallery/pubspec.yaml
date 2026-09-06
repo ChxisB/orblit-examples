@@ -40,6 +40,15 @@ dependencies:
       path: packages/orbis_filament
       ref: master
 
+  # What the air is doing, and what is above it. Its own package because
+  # nothing in it draws anything or knows what a renderer is — a game running
+  # on a console has the same weather as one running in the editor.
+  orbis_weather:
+    git:
+      url: git@github.com:Orbis-Engine/orbis.git
+      path: packages/orbis_weather
+      ref: master
+
   # The interface layer, from the scripting runtime's repository: a
   # description styled with utility classes or CSS, built as real widgets.
   orbis_script_ui:
