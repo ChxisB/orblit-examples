@@ -42,7 +42,8 @@ class CrowdExample extends Example {
 
   double count = 100000;
   bool drifting = false;
-  double spread = 150;
+  double spread = 1500;
+  double range = 350;
 
   /// The buffers, kept rather than rebuilt.
   ///
@@ -89,6 +90,10 @@ class CrowdExample extends Example {
           minimum: Vector3(-spread, -2, -spread),
           maximum: Vector3(spread, 14, spread),
           revision: _revision,
+          // How far a member is still drawn from. The whole map stays
+          // loaded — one buffer, uploaded once — and what is too far to see
+          // costs a distance test rather than a draw.
+          range: range,
           castShadows: false,
         ),
       ],
@@ -238,11 +243,23 @@ class CrowdExample extends Example {
           label: 'Spread',
           value: spread,
           min: 40,
-          max: 400,
+          max: 2000,
           decimals: 0,
           unit: ' m',
           onChanged: (value) {
             spread = value;
+            changed();
+          },
+        ),
+        Setting(
+          label: 'View range',
+          value: range,
+          min: 0,
+          max: 600,
+          decimals: 0,
+          unit: ' m',
+          onChanged: (value) {
+            range = value;
             changed();
           },
         ),

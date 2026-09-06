@@ -41,6 +41,7 @@ class WeatherExample extends Example {
   double cloudAltitude = 900;
   String shape = 'Cumulus';
   double lightning = 0;
+  SkyQuality quality = SkyQuality.fair;
 
   /// The shapes on offer, each a real one rather than a preset of the same
   /// one: they differ in how high the base sits, how deep the layer is, how
@@ -138,6 +139,7 @@ class WeatherExample extends Example {
         zenith: linearOf(const Color(0xFF3E6FA8)),
         horizon: linearOf(const Color(0xFFBCCBD8)),
         ambient: 22000,
+        quality: quality,
         // The way the light comes from, which is the way the light goes, the
         // other way round.
         bodyDirection: Vector3(0.42, 0.36, 0.52)..normalize(),
@@ -201,6 +203,23 @@ class WeatherExample extends Example {
           selected: condition,
           onSelect: (option) {
             _apply(option);
+            changed();
+          },
+        ),
+        Choice(
+          label: 'Sky detail',
+          options: const ['Lean', 'Fair', 'Full'],
+          selected: switch (quality) {
+            SkyQuality.lean => 'Lean',
+            SkyQuality.fair => 'Fair',
+            SkyQuality.full => 'Full',
+          },
+          onSelect: (option) {
+            quality = switch (option) {
+              'Lean' => SkyQuality.lean,
+              'Fair' => SkyQuality.fair,
+              _ => SkyQuality.full,
+            };
             changed();
           },
         ),
