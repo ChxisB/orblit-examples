@@ -181,7 +181,7 @@ class InterfaceExample extends Example {
   /// The interface, over the scene.
   @override
   Widget? overlay(BuildContext context, VoidCallback changed) {
-    return ScriptedSurface(
+    return UiSurface(
       description: description,
       onEvent: (handler, payload) {
         // What the host does with an event. In a game this goes back into the
