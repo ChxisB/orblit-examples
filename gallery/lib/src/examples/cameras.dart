@@ -25,6 +25,8 @@ class CamerasExample extends Example {
   CamerasExample() {
     _brain
       ..add(_chase)
+      ..add(_eyes)
+      ..add(_flat)
       ..add(_watchtower)
       ..add(_orbit)
       ..snap();
@@ -35,7 +37,7 @@ class CamerasExample extends Example {
 
   @override
   String get blurb =>
-      'Shots with priorities, blended between, with their framing drawn.';
+      'Third person, first person and flat, blended between, framing drawn.';
 
   @override
   ViewPoint get viewpoint => const ViewPoint(distance: 22, pitch: 0.4);
@@ -88,6 +90,51 @@ class CamerasExample extends Example {
     lens: const Lens(fieldOfView: 38),
   );
 
+  /// First person: on the subject's own head, looking where it looks.
+  ///
+  /// Nothing composes, nothing damps and nothing frames. Any of those would
+  /// put the view somewhere other than where the character is looking, which
+  /// is the one thing a first-person camera may never do.
+  late final VirtualCamera _eyes = VirtualCamera(
+    name: 'First person',
+    priority: 10,
+    follow: _subject,
+    lookAt: _subject,
+    body: FollowBody(
+      offset: Vector3(0, 0.75, -0.2),
+      binding: FollowBinding.targetRotation,
+      damping: Vector3.zero(),
+    ),
+    aim: HeadAim(),
+    lens: const Lens(fieldOfView: 70),
+  );
+
+  /// A game seen flat on, from above. Framed by moving, because turning an
+  /// orthographic view does not move anything through the frame.
+  late final ScreenFollowBody _flatBody = ScreenFollowBody(
+    distance: 40,
+    screenY: 0.55,
+    deadZoneWidth: 0.12,
+    deadZoneHeight: 0.16,
+    softZoneWidth: 0.38,
+    softZoneHeight: 0.35,
+    damping: 0.35,
+    // A level has edges, and a camera that follows a character over one shows
+    // whatever is past it.
+    bounds: (minimum: Vector3(-6, 30, -6), maximum: Vector3(6, 50, 22)),
+  );
+
+  late final VirtualCamera _flat = VirtualCamera(
+    name: 'Flat',
+    priority: 10,
+    follow: _subject,
+    lookAt: _subject,
+    body: _flatBody,
+    // Looking straight down, level with the world's own axes.
+    aim: StaticAim(lookRotation(Vector3(0, -1, -0.0001))),
+    lens: const Lens.flat(height: 26),
+  );
+
   late final VirtualCamera _orbit = VirtualCamera(
     name: 'Orbit',
     priority: 10,
@@ -135,9 +182,9 @@ class CamerasExample extends Example {
       ..rotation = lookRotation(ahead - at, null);
 
     _brain.blends.defaultBlend = Blend(blendStyle, blendSeconds);
-    _chase.priority = live == 'Chase' ? 20 : 10;
-    _watchtower.priority = live == 'Watchtower' ? 20 : 10;
-    _orbit.priority = live == 'Orbit' ? 20 : 10;
+    for (final camera in [_chase, _eyes, _flat, _watchtower, _orbit]) {
+      camera.priority = camera.name == live ? 20 : 10;
+    }
 
     _brain.update(delta);
 
@@ -219,6 +266,8 @@ class CamerasExample extends Example {
       // along its own forward is the same thing said the other way.
       target: state.position + state.forward,
       fieldOfView: state.lens.fieldOfView,
+      orthographic: state.lens.orthographic,
+      viewHeight: state.lens.height,
     );
   }
 
@@ -227,7 +276,9 @@ class CamerasExample extends Example {
     if (!showGuides) return null;
 
     final camera = _brain.live;
-    final guides = camera?.aim.guides;
+    // From whichever of the two is framing: a camera frames by turning or by
+    // moving, and which one depends on the shot.
+    final guides = camera?.guides;
     if (guides == null) return null;
 
     return IgnorePointer(
@@ -269,8 +320,19 @@ class CamerasExample extends Example {
       children: [
         Choice(
           label: 'Live',
-          options: const ['Chase', 'Watchtower', 'Orbit'],
-          selected: live,
+          options: const ['Chase', 'First person', 'Flat'],
+          selected: const ['Chase', 'First person', 'Flat'].contains(live)
+              ? live
+              : '',
+          onSelect: (option) {
+            live = option;
+            changed();
+          },
+        ),
+        Choice(
+          label: '',
+          options: const ['Watchtower', 'Orbit'],
+          selected: live == 'Watchtower' || live == 'Orbit' ? live : '',
           onSelect: (option) {
             live = option;
             changed();
