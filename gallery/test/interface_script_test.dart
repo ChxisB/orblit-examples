@@ -68,6 +68,41 @@ void main() {
       final builder = UiBuilder();
       expect(builder.unknownIn(InterfaceExample().description), isEmpty);
     });
+
+    testWidgets('the menu is a second script, not the first one again',
+        (tester) async {
+      final example = InterfaceExample()..showing = 'Menu';
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SizedBox(
+              width: 900,
+              height: 700,
+              child: UiBuilder().build(example.description),
+            ),
+          ),
+        ),
+      );
+
+      // Written in menu.tsx, and nowhere in hud.tsx.
+      expect(find.text('Paused'), findsOneWidget);
+      expect(find.text('Resume'), findsOneWidget);
+      expect(find.text('Quit to menu'), findsOneWidget);
+      // A list written with `.map`, which the types now allow and the runtime
+      // always flattened.
+      expect(find.text('Punishing'), findsOneWidget);
+    });
+
+    test('switching back gives a fresh engine, not the menu with a hat on', () {
+      final example = InterfaceExample()..showing = 'Menu';
+      expect(_textsIn(example.description), contains('Paused'));
+
+      example.showing = 'HUD';
+      final texts = _textsIn(example.description);
+      expect(texts, contains('Sector 12'));
+      expect(texts, isNot(contains('Paused')));
+    });
   });
 }
 

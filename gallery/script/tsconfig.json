@@ -26,6 +26,9 @@
       "orbis": ["../../../orbis-script/packages/orbis_script_ui/types/ui"],
       "orbis/jsx-runtime": [
         "../../../orbis-script/packages/orbis_script_ui/types/jsx-runtime"
+      ],
+      "orbis/scene": [
+        "../../../orbis-script/packages/orbis_script_scene/types/scene"
       ]
     }
   },

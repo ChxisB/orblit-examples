@@ -8,7 +8,7 @@ import 'package:orbis_script_ui/orbis_script_ui.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
 
 import '../example.dart';
-import 'hud_script.g.dart';
+import 'scripts.g.dart';
 import 'surface.dart' show linearOf;
 
 /// An interface over a running scene, written in TypeScript.
@@ -23,11 +23,11 @@ class InterfaceExample extends Example {
   InterfaceExample();
 
   @override
-  String get name => 'An interface';
+  String get name => 'An interface in TypeScript';
 
   @override
   String get blurb =>
-      'A heads-up display described in one tree, styled with classes or CSS.';
+      'Two interfaces written in .tsx, running in the engine, drawn by Flutter.';
 
   @override
   ViewPoint get viewpoint => const ViewPoint(distance: 12, pitch: 0.22);
@@ -39,6 +39,8 @@ class InterfaceExample extends Example {
   // without asking Dart. Holding a copy here and pushing it in before every
   // render would overwrite whatever the script had just done — which it did,
   // and the button appeared to do nothing.
+  bool get isHud => showing == 'HUD';
+
   double get health => _number('hull');
   set health(double value) => _write('hull', '$value');
 
@@ -64,11 +66,29 @@ class InterfaceExample extends Example {
   /// Not a description written in Dart that stands in for one: this is
   /// [hudScript] — the compiled output of `script/hud.tsx` — in QuickJS, asked
   /// to describe the interface after every change.
+  /// Which of the example's interfaces is loaded.
+  ///
+  /// Two, because one proves nothing about whether the first was a special
+  /// case. They share no code: each is a whole .tsx of its own.
+  String showing = 'HUD';
+
+  static const Map<String, String> _written = {
+    'HUD': hudScript,
+    'Menu': menuScript,
+  };
+
   ScriptHost? _host;
+  String? _loaded;
 
   ScriptHost get host {
     final running = _host;
-    if (running != null) return running;
+    if (running != null && _loaded == showing) return running;
+
+    // A different interface is a different script, and a script that has been
+    // replaced should not leave its predecessor's state behind — so it gets a
+    // fresh engine rather than a second mount into the old one.
+    running?.dispose();
+    _loaded = showing;
 
     final started = ScriptHost()
       // The interface library first: the elements, both JSX factories, and the
@@ -79,8 +99,8 @@ class InterfaceExample extends Example {
     // Then the game's own file, kept under a name so that what it exports can
     // be reached: its state lives in a module, and the settings write into it.
     started.eval(
-      ScriptModule.around(hudScript, name: 'hud'),
-      fileName: 'script/hud.tsx',
+      ScriptModule.around(_written[showing]!, name: 'hud'),
+      fileName: 'script/${showing.toLowerCase()}.tsx',
     );
 
     return _host = started;
@@ -185,6 +205,24 @@ class InterfaceExample extends Example {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        Choice(
+          label: 'Written',
+          options: _written.keys.toList(),
+          selected: showing,
+          onSelect: (option) {
+            showing = option;
+            changed();
+          },
+        ),
+        if (!isHud)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Text(
+              'The menu keeps its own state — press the choices in it.',
+              style: TextStyle(fontSize: 12, color: Color(0xFF8A93A0)),
+            ),
+          ),
+        if (isHud) ...[
         Setting(
           label: 'Hull',
           value: health,
@@ -212,6 +250,7 @@ class InterfaceExample extends Example {
             changed();
           },
         ),
+        ],
       ],
     );
   }

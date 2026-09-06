@@ -12,9 +12,11 @@ import 'src/examples/cameras.dart';
 import 'src/examples/crowd.dart';
 import 'src/examples/day_and_night.dart';
 import 'src/examples/interface.dart';
+import 'src/examples/interface_native.dart';
 import 'src/examples/lights.dart';
 import 'src/examples/many.dart';
 import 'src/examples/meshes.dart';
+import 'src/examples/spawning.dart';
 import 'src/examples/surface.dart';
 import 'src/examples/weather.dart';
 
@@ -64,6 +66,8 @@ class _GalleryState extends State<Gallery> with SingleTickerProviderStateMixin {
     DayAndNightExample(),
     WeatherExample(),
     InterfaceExample(),
+    NativeInterfaceExample(),
+    SpawningExample(),
     ManyExample(),
     CrowdExample(),
     CamerasExample(),

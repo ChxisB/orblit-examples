@@ -67,6 +67,12 @@ dependencies:
       path: packages/orbis_script
       ref: master
 
+  orbis_script_scene:
+    git:
+      url: git@github.com:Orbis-Engine/orbis-script.git
+      path: packages/orbis_script_scene
+      ref: master
+
   orbis_script_ui:
     git:
       url: git@github.com:Orbis-Engine/orbis-script.git
