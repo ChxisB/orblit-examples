@@ -20,6 +20,7 @@ import 'src/examples/many.dart';
 import 'src/examples/meshes.dart';
 import 'src/examples/materials.dart';
 import 'src/examples/post.dart';
+import 'src/examples/video.dart';
 import 'src/examples/spawning.dart';
 import 'src/examples/surface.dart';
 import 'src/examples/weather.dart';
@@ -43,6 +44,7 @@ List<Example> galleryExamples() => [
   MeshesExample(),
   MaterialsExample(),
   PostExample(),
+  VideoExample(),
   BenchmarkExample(),
 ];
 
