@@ -5,8 +5,7 @@ import 'package:orbis_filament/orbis_filament.dart';
 import 'package:orbis_script_ui/orbis_script_ui.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
 
-import '../example.dart';
-import 'surface.dart' show linearOf;
+import 'package:orbis_examples/orbis_examples.dart';
 
 /// The same kind of interface, described in Dart.
 ///

@@ -7,9 +7,8 @@ import 'package:orbis_script/orbis_script.dart';
 import 'package:orbis_script_ui/orbis_script_ui.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
 
-import '../example.dart';
+import 'package:orbis_examples/orbis_examples.dart';
 import 'scripts.g.dart';
-import 'surface.dart' show linearOf;
 
 /// An interface over a running scene, written in TypeScript.
 ///

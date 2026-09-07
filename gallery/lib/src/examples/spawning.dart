@@ -4,9 +4,8 @@ import 'package:orbis_script/orbis_script.dart';
 import 'package:orbis_script_scene/orbis_script_scene.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
 
-import '../example.dart';
+import 'package:orbis_examples/orbis_examples.dart';
 import 'scripts.g.dart';
-import 'surface.dart' show linearOf;
 
 /// A world put together in TypeScript.
 ///
