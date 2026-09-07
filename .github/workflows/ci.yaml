@@ -4,9 +4,25 @@ on:
   push:
     branches: [master]
   pull_request:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: 'Flutter channel to build against'
+        required: false
+        default: stable
+        type: choice
+        options: [stable, beta, master]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  FLUTTER_CHANNEL: ${{ inputs.channel || 'stable' }}
 
 jobs:
   check:
+    name: Simulation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,3 +54,63 @@ jobs:
       - name: Check
         working-directory: orbis-examples
         run: ./tool/check.sh
+
+  # The two apps that draw. Both were checked by nothing before: the job above
+  # runs on Linux and skips them, so a change that broke the gallery reached
+  # master looking green.
+  apps:
+    name: Apps (macOS)
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: orbis-examples
+      - uses: actions/checkout@v4
+        with:
+          repository: Orbis-Engine/orbis
+          path: orbis
+          token: ${{ secrets.ORBIS_ENGINE_TOKEN }}
+      - uses: actions/checkout@v4
+        with:
+          repository: Orbis-Engine/orbis-net
+          path: orbis-net
+          token: ${{ secrets.ORBIS_ENGINE_TOKEN }}
+      # The gallery shows the scripted examples, so scripting has to be here
+      # too or its dependencies do not resolve.
+      - uses: actions/checkout@v4
+        with:
+          repository: Orbis-Engine/orbis-script
+          path: orbis-script
+          token: ${{ secrets.ORBIS_ENGINE_TOKEN }}
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          cache: true
+
+      - name: Cache Filament SDK
+        uses: actions/cache@v4
+        with:
+          path: orbis/packages/orbis_filament/macos/third_party
+          key: filament-${{ runner.os }}-${{ hashFiles('orbis/packages/orbis_filament/macos/setup.sh') }}
+
+      - name: Link local checkouts
+        working-directory: orbis-examples
+        run: ./tool/link_local.sh ../orbis ../orbis-net ../orbis-script
+
+      - name: Build the viewport
+        working-directory: orbis-examples/viewport
+        run: flutter build macos --debug
+
+      # The viewport opens straight into a scene, so it is the one app whose
+      # first frame can be waited for. What that catches is the class of fault
+      # a build cannot: a Filament precondition that aborts on the frame it is
+      # reached, in a binary that linked cleanly.
+      - name: Draw a frame
+        working-directory: orbis-examples/viewport
+        run: ../../orbis/tool/ci_draw_frame.sh build/macos/Build/Products/Debug/orbis_viewport.app
+
+      - name: Build the gallery
+        working-directory: orbis-examples/gallery
+        run: flutter build macos --debug
