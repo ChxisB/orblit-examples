@@ -1,2 +1,8 @@
 #include "../../Flutter/Flutter-Debug.xcconfig"
 #include "Warnings.xcconfig"
+
+// Filament ships arm64 only, so there is nothing to link an Intel slice
+// against. Debug got away without this because it builds the active
+// architecture and nothing else; a profile or release build asks for both and
+// fails on the one that cannot exist.
+EXCLUDED_ARCHS = x86_64
