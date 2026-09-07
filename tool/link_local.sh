@@ -33,6 +33,8 @@ cat > gallery/pubspec_overrides.yaml <<YAML
 dependency_overrides:
   orbis_camera:
     path: $ENGINE/packages/orbis_camera
+  orbis_examples:
+    path: $ENGINE/packages/orbis_examples
   orbis_filament:
     path: $ENGINE/packages/orbis_filament
   orbis_light:

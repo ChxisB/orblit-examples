@@ -24,7 +24,14 @@ dart run simulation/bin/simulation.dart
 ## The gallery
 
 Each example in it is one file and stands on its own: what it needs to work
-is what is written in it, and that is what the panel on the right shows. They
+is what is written in it, and that is what the panel on the right shows.
+
+Most of them live in the engine's own `orbis_examples` package rather than
+here, because the editor shows the same ones beside the projects somebody is
+working on — an example written twice is an example that drifts. What stays
+here are the three that run TypeScript, beside the scripting runtime they
+need: in the shared package they would mean every host of it building QuickJS
+to show eleven examples that never touch it. They
 are not steps in a tutorial and nothing is shared between them but the
 surface they draw on.
 

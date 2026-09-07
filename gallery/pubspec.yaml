@@ -51,6 +51,15 @@ dependencies:
       path: packages/orbis_camera
       ref: master
 
+  # The examples themselves. A package, because the editor shows the same
+  # ones — a gallery whose examples only the gallery could run would be a
+  # gallery nobody sees while they are working.
+  orbis_examples:
+    git:
+      url: git@github.com:Orbis-Engine/orbis.git
+      path: packages/orbis_examples
+      ref: master
+
   orbis_weather:
     git:
       url: git@github.com:Orbis-Engine/orbis.git

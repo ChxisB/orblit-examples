@@ -8,47 +8,37 @@ import 'package:flutter/services.dart';
 import 'package:orbis_filament/orbis_filament.dart';
 import 'package:orbis_script/orbis_script.dart';
 
-import 'src/example.dart';
-import 'src/examples/benchmark.dart';
-import 'src/examples/cameras.dart';
-import 'src/examples/crowd.dart';
-import 'src/examples/day_and_night.dart';
+import 'package:orbis_examples/orbis_examples.dart';
+
 import 'src/examples/interface.dart';
 import 'src/examples/interface_native.dart';
-import 'src/examples/lights.dart';
-import 'src/examples/many.dart';
-import 'src/examples/meshes.dart';
-import 'src/examples/materials.dart';
-import 'src/examples/pipeline.dart';
-import 'src/examples/post.dart';
-import 'src/examples/video.dart';
 import 'src/examples/spawning.dart';
-import 'src/examples/surface.dart';
-import 'src/examples/weather.dart';
 
 /// Every example the gallery shows, in the order it shows them.
+///
+/// Most of them come from `orbis_examples`, which the editor shows too. The
+/// three here need the scripting runtime, and live beside it rather than in
+/// that package: putting them there would mean every host of it building
+/// QuickJS to show eleven examples that never touch it.
 ///
 /// A function rather than a field on the app, so that a test can ask for the
 /// same list rather than keeping a copy of it — a copy is how a test ends up
 /// passing for an example nobody can reach.
-List<Example> galleryExamples() => [
-  SurfaceExample(),
-  LightsExample(),
-  DayAndNightExample(),
-  WeatherExample(),
-  InterfaceExample(),
-  NativeInterfaceExample(),
-  SpawningExample(),
-  ManyExample(),
-  CrowdExample(),
-  CamerasExample(),
-  MeshesExample(),
-  MaterialsExample(),
-  PipelineExample(),
-  PostExample(),
-  VideoExample(),
-  BenchmarkExample(),
-];
+List<Example> galleryExamples() {
+  final engine = engineExamples();
+
+  // The scripting ones go after the weather, where they were: the order is
+  // the order somebody should meet them in, and it does not change because
+  // some of them moved house.
+  final after = engine.indexWhere((e) => e is WeatherExample) + 1;
+  return [
+    ...engine.take(after),
+    InterfaceExample(),
+    NativeInterfaceExample(),
+    SpawningExample(),
+    ...engine.skip(after),
+  ];
+}
 
 void main() => runApp(const GalleryApp());
 
