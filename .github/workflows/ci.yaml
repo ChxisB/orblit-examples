@@ -4,9 +4,25 @@ on:
   push:
     branches: [master]
   pull_request:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: 'Flutter channel to build against'
+        required: false
+        default: stable
+        type: choice
+        options: [stable, beta, master]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  FLUTTER_CHANNEL: ${{ inputs.channel || 'stable' }}
 
 jobs:
   check:
+    name: Simulation
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,14 +34,14 @@ jobs:
       # dependencies it has no credentials for.
       - uses: actions/checkout@v4
         with:
+          # No token: these repositories are public, so the default
+          # GITHUB_TOKEN reads them. Nothing here needs a secret.
           repository: Orbis-Engine/orbis
           path: orbis
-          token: ${{ secrets.ORBIS_ENGINE_TOKEN }}
       - uses: actions/checkout@v4
         with:
           repository: Orbis-Engine/orbis-net
           path: orbis-net
-          token: ${{ secrets.ORBIS_ENGINE_TOKEN }}
 
       - uses: dart-lang/setup-dart@v1
         with:
@@ -38,3 +54,76 @@ jobs:
       - name: Check
         working-directory: orbis-examples
         run: ./tool/check.sh
+
+  # The two apps that draw. Both were checked by nothing before: the job above
+  # runs on Linux and skips them, so a change that broke the gallery reached
+  # master looking green.
+  apps:
+    name: Apps (macOS)
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: orbis-examples
+      - uses: actions/checkout@v4
+        with:
+          repository: Orbis-Engine/orbis
+          path: orbis
+      - uses: actions/checkout@v4
+        with:
+          repository: Orbis-Engine/orbis-net
+          path: orbis-net
+      # The gallery shows the scripted examples, so scripting has to be here
+      # too or its dependencies do not resolve.
+      - uses: actions/checkout@v4
+        with:
+          repository: Orbis-Engine/orbis-script
+          path: orbis-script
+          # QuickJS is a pinned submodule, and the interpreter is compiled
+          # from its sources at build time. Without this the checkout stops
+          # at the gitlink and clang fails on a list of .c files that are not
+          # there.
+          submodules: recursive
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          cache: true
+
+      - name: Cache Filament SDK
+        uses: actions/cache@v4
+        with:
+          path: orbis/packages/orbis_filament/macos/third_party
+          key: filament-${{ runner.os }}-${{ hashFiles('orbis/packages/orbis_filament/macos/setup.sh') }}
+
+      # Fetches the Filament SDK and compiles the materials into the C
+      # arrays the renderer includes. This runs from the podspec's
+      # prepare_command under CocoaPods, and Swift Package Manager has no
+      # equivalent hook — a package plugin runs sandboxed, with no network —
+      # so on the SPM path, which is now Flutter's default for macOS, nothing
+      # runs it and the build fails on a missing generated header. It is
+      # idempotent, so calling it here is free when the cache is warm.
+      - name: Fetch Filament and compile materials
+        run: bash orbis/packages/orbis_filament/macos/setup.sh
+
+      - name: Link local checkouts
+        working-directory: orbis-examples
+        run: ./tool/link_local.sh ../orbis ../orbis-net ../orbis-script
+
+      - name: Build the viewport
+        working-directory: orbis-examples/viewport
+        run: flutter build macos --debug
+
+      # No frame smoke here. The engine's own CI builds this same viewport
+      # and waits for its first frame, so running it again would check the
+      # same thing twice — and it would do so by calling a script out of the
+      # engine repository's default branch, which is a dependency on a file
+      # this repository's pull requests cannot change. That coupling has
+      # already broken this job once.
+      #
+      # What is this repository's business is that its apps build.
+
+      - name: Build the gallery
+        working-directory: orbis-examples/gallery
+        run: flutter build macos --debug
