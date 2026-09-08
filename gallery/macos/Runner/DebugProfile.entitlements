@@ -2,8 +2,16 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- Off for debug only; Release.entitlements keeps the sandbox.
+
+	     The gallery is a developer tool that shows scenes from wherever they
+	     happen to be on disk: the Bistro is half a gigabyte fetched into the
+	     engine checkout, and the meshes example exists to be pointed at a
+	     file somebody names. A sandboxed process cannot read either, and it
+	     does not fail loudly — the renderer draws its fallback cube, so the
+	     scene looks wrong rather than broken and the reason is invisible. -->
 	<key>com.apple.security.app-sandbox</key>
-	<true/>
+	<false/>
 	<key>com.apple.security.cs.allow-jit</key>
 	<true/>
 	<key>com.apple.security.network.server</key>
