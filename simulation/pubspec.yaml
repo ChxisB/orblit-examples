@@ -12,17 +12,17 @@ environment:
 dependencies:
   orbis_codegen:
     git:
-      url: git@github.com:Orbis-Engine/orbis.git
+      url: https://github.com/Orbis-Engine/orbis.git
       path: packages/orbis_codegen
       ref: master
   orbis_core:
     git:
-      url: git@github.com:Orbis-Engine/orbis.git
+      url: https://github.com/Orbis-Engine/orbis.git
       path: packages/orbis_core
       ref: master
   orbis_net:
     git:
-      url: git@github.com:Orbis-Engine/orbis-net.git
+      url: https://github.com/Orbis-Engine/orbis-net.git
       ref: master
 
 dev_dependencies:

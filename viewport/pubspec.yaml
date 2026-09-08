@@ -33,7 +33,7 @@ dependencies:
 
   orbis_filament:
     git:
-      url: git@github.com:Orbis-Engine/orbis.git
+      url: https://github.com/Orbis-Engine/orbis.git
       path: packages/orbis_filament
       ref: master
 
