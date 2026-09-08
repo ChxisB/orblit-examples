@@ -80,6 +80,11 @@ jobs:
         with:
           repository: Orbis-Engine/orbis-script
           path: orbis-script
+          # QuickJS is a pinned submodule, and the interpreter is compiled
+          # from its sources at build time. Without this the checkout stops
+          # at the gitlink and clang fails on a list of .c files that are not
+          # there.
+          submodules: recursive
 
       - uses: subosito/flutter-action@v2
         with:
