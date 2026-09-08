@@ -110,13 +110,14 @@ jobs:
         working-directory: orbis-examples/viewport
         run: flutter build macos --debug
 
-      # The viewport opens straight into a scene, so it is the one app whose
-      # first frame can be waited for. What that catches is the class of fault
-      # a build cannot: a Filament precondition that aborts on the frame it is
-      # reached, in a binary that linked cleanly.
-      - name: Draw a frame
-        working-directory: orbis-examples/viewport
-        run: ../../orbis/tool/ci_draw_frame.sh build/macos/Build/Products/Debug/orbis_viewport.app
+      # No frame smoke here. The engine's own CI builds this same viewport
+      # and waits for its first frame, so running it again would check the
+      # same thing twice — and it would do so by calling a script out of the
+      # engine repository's default branch, which is a dependency on a file
+      # this repository's pull requests cannot change. That coupling has
+      # already broken this job once.
+      #
+      # What is this repository's business is that its apps build.
 
       - name: Build the gallery
         working-directory: orbis-examples/gallery
