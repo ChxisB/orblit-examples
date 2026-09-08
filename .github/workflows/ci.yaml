@@ -34,14 +34,14 @@ jobs:
       # dependencies it has no credentials for.
       - uses: actions/checkout@v4
         with:
+          # No token: these repositories are public, so the default
+          # GITHUB_TOKEN reads them. Nothing here needs a secret.
           repository: Orbis-Engine/orbis
           path: orbis
-          token: ${{ secrets.ORBIS_ENGINE_TOKEN }}
       - uses: actions/checkout@v4
         with:
           repository: Orbis-Engine/orbis-net
           path: orbis-net
-          token: ${{ secrets.ORBIS_ENGINE_TOKEN }}
 
       - uses: dart-lang/setup-dart@v1
         with:
@@ -70,19 +70,16 @@ jobs:
         with:
           repository: Orbis-Engine/orbis
           path: orbis
-          token: ${{ secrets.ORBIS_ENGINE_TOKEN }}
       - uses: actions/checkout@v4
         with:
           repository: Orbis-Engine/orbis-net
           path: orbis-net
-          token: ${{ secrets.ORBIS_ENGINE_TOKEN }}
       # The gallery shows the scripted examples, so scripting has to be here
       # too or its dependencies do not resolve.
       - uses: actions/checkout@v4
         with:
           repository: Orbis-Engine/orbis-script
           path: orbis-script
-          token: ${{ secrets.ORBIS_ENGINE_TOKEN }}
 
       - uses: subosito/flutter-action@v2
         with:

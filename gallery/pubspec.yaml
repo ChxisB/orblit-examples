@@ -36,7 +36,7 @@ dependencies:
   # checkout while somebody is working on the engine itself.
   orbis_filament:
     git:
-      url: git@github.com:Orbis-Engine/orbis.git
+      url: https://github.com/Orbis-Engine/orbis.git
       path: packages/orbis_filament
       ref: master
 
@@ -47,7 +47,7 @@ dependencies:
   # situations, and the brain picks between them.
   orbis_camera:
     git:
-      url: git@github.com:Orbis-Engine/orbis.git
+      url: https://github.com/Orbis-Engine/orbis.git
       path: packages/orbis_camera
       ref: master
 
@@ -56,13 +56,13 @@ dependencies:
   # gallery nobody sees while they are working.
   orbis_examples:
     git:
-      url: git@github.com:Orbis-Engine/orbis.git
+      url: https://github.com/Orbis-Engine/orbis.git
       path: packages/orbis_examples
       ref: master
 
   orbis_weather:
     git:
-      url: git@github.com:Orbis-Engine/orbis.git
+      url: https://github.com/Orbis-Engine/orbis.git
       path: packages/orbis_weather
       ref: master
 
@@ -72,19 +72,19 @@ dependencies:
   # interface example loads real compiled TypeScript into it.
   orbis_script:
     git:
-      url: git@github.com:Orbis-Engine/orbis-script.git
+      url: https://github.com/Orbis-Engine/orbis-script.git
       path: packages/orbis_script
       ref: master
 
   orbis_script_scene:
     git:
-      url: git@github.com:Orbis-Engine/orbis-script.git
+      url: https://github.com/Orbis-Engine/orbis-script.git
       path: packages/orbis_script_scene
       ref: master
 
   orbis_script_ui:
     git:
-      url: git@github.com:Orbis-Engine/orbis-script.git
+      url: https://github.com/Orbis-Engine/orbis-script.git
       path: packages/orbis_script_ui
       ref: master
 
