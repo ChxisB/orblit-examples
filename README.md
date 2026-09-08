@@ -56,4 +56,5 @@ committed — so nothing ships wired to a path on one machine.
 
 ## Licence
 
-MIT.
+MIT, © 2026 Chris Beckett. The gallery and the viewport link the renderer, so builds
+carry Filament's Apache 2.0 licence too — see [LICENSE](LICENSE).
