@@ -106,6 +106,13 @@ void main() {
       });
 
       testWidgets('shows its settings, and its own source', (tester) async {
+        // In the panel the gallery actually puts them in, which is a coloured
+        // container inside a scrolling list. That detail is not decoration:
+        // some Material widgets paint onto the nearest Material ancestor and
+        // report themselves broken when something opaque sits in between, so
+        // a settings panel built in a bare Scaffold can pass here while the
+        // real one reports an error on every frame it is on screen.
+        //
         // Built through a Builder because the settings want a context, and
         // there is no context until the tree they are going into exists.
         await tester.pumpWidget(
@@ -114,9 +121,15 @@ void main() {
               body: SizedBox(
                 width: 320,
                 height: 900,
-                child: SingleChildScrollView(
-                  child: Builder(
-                    builder: (context) => example.settings(context, () {}),
+                child: DecoratedBox(
+                  decoration: const BoxDecoration(color: Color(0xFF12161D)),
+                  child: ListView(
+                    padding: const EdgeInsets.all(16),
+                    children: [
+                      Builder(
+                        builder: (context) => example.settings(context, () {}),
+                      ),
+                    ],
                   ),
                 ),
               ),
