@@ -36,7 +36,7 @@ dependencies:
   # checkout while somebody is working on the engine itself.
   orblit_filament:
     git:
-      url: https://github.com/Orblit-Engine/orblit.git
+      url: https://github.com/ChxisB/orblit.git
       path: packages/orblit_filament
       ref: main
 
@@ -47,7 +47,7 @@ dependencies:
   # situations, and the brain picks between them.
   orblit_camera:
     git:
-      url: https://github.com/Orblit-Engine/orblit.git
+      url: https://github.com/ChxisB/orblit.git
       path: packages/orblit_camera
       ref: main
 
@@ -56,13 +56,13 @@ dependencies:
   # gallery nobody sees while they are working.
   orblit_examples:
     git:
-      url: https://github.com/Orblit-Engine/orblit.git
+      url: https://github.com/ChxisB/orblit.git
       path: packages/orblit_examples
       ref: main
 
   orblit_weather:
     git:
-      url: https://github.com/Orblit-Engine/orblit.git
+      url: https://github.com/ChxisB/orblit.git
       path: packages/orblit_weather
       ref: main
 
@@ -72,19 +72,19 @@ dependencies:
   # interface example loads real compiled TypeScript into it.
   orblit_script:
     git:
-      url: https://github.com/Orblit-Engine/orblit-script.git
+      url: https://github.com/ChxisB/orblit-script.git
       path: packages/orblit_script
       ref: main
 
   orblit_script_scene:
     git:
-      url: https://github.com/Orblit-Engine/orblit-script.git
+      url: https://github.com/ChxisB/orblit-script.git
       path: packages/orblit_script_scene
       ref: main
 
   orblit_script_ui:
     git:
-      url: https://github.com/Orblit-Engine/orblit-script.git
+      url: https://github.com/ChxisB/orblit-script.git
       path: packages/orblit_script_ui
       ref: main
 

@@ -27,7 +27,7 @@ NET=$(resolve "${2:-../orblit-net}")
 SCRIPT=$(resolve "${3:-../orblit-script}")
 
 if [ -z "$ENGINE" ]; then
-  echo "No engine checkout at ${1:-../orblit}. Clone Orblit-Engine/orblit beside this one."
+  echo "No engine checkout at ${1:-../orblit}. Clone ChxisB/orblit beside this one."
   exit 1
 fi
 

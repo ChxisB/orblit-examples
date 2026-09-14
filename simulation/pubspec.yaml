@@ -12,17 +12,17 @@ environment:
 dependencies:
   orblit_codegen:
     git:
-      url: https://github.com/Orblit-Engine/orblit.git
+      url: https://github.com/ChxisB/orblit.git
       path: packages/orblit_codegen
       ref: main
   orblit_core:
     git:
-      url: https://github.com/Orblit-Engine/orblit.git
+      url: https://github.com/ChxisB/orblit.git
       path: packages/orblit_core
       ref: main
   orblit_net:
     git:
-      url: https://github.com/Orblit-Engine/orblit-net.git
+      url: https://github.com/ChxisB/orblit-net.git
       ref: main
 
 dev_dependencies:

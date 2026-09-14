@@ -36,11 +36,11 @@ jobs:
         with:
           # No token: these repositories are public, so the default
           # GITHUB_TOKEN reads them. Nothing here needs a secret.
-          repository: Orblit-Engine/orblit
+          repository: ChxisB/orblit
           path: orblit
       - uses: actions/checkout@v4
         with:
-          repository: Orblit-Engine/orblit-net
+          repository: ChxisB/orblit-net
           path: orblit-net
 
       - uses: dart-lang/setup-dart@v1
@@ -68,17 +68,17 @@ jobs:
           path: orblit-examples
       - uses: actions/checkout@v4
         with:
-          repository: Orblit-Engine/orblit
+          repository: ChxisB/orblit
           path: orblit
       - uses: actions/checkout@v4
         with:
-          repository: Orblit-Engine/orblit-net
+          repository: ChxisB/orblit-net
           path: orblit-net
       # The gallery shows the scripted examples, so scripting has to be here
       # too or its dependencies do not resolve.
       - uses: actions/checkout@v4
         with:
-          repository: Orblit-Engine/orblit-script
+          repository: ChxisB/orblit-script
           path: orblit-script
           # QuickJS is a pinned submodule, and the interpreter is compiled
           # from its sources at build time. Without this the checkout stops

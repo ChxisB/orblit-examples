@@ -1,6 +1,6 @@
 # orblit-examples
 
-Worked examples of what [Orblit](https://github.com/Orblit-Engine/orblit) can do,
+Worked examples of what [Orblit](https://github.com/ChxisB/orblit) can do,
 and how. Each one is small enough to read in a sitting and does one thing
 properly, rather than being a game with the technique buried in it.
 
