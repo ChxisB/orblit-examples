@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
   workflow_dispatch:
     inputs:
@@ -57,7 +57,7 @@ jobs:
 
   # The two apps that draw. Both were checked by nothing before: the job above
   # runs on Linux and skips them, so a change that broke the gallery reached
-  # master looking green.
+  # main looking green.
   apps:
     name: Apps (macOS)
     runs-on: macos-latest
