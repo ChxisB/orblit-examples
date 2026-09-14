@@ -38,7 +38,7 @@ dependencies:
     git:
       url: https://github.com/Orblit-Engine/orblit.git
       path: packages/orblit_filament
-      ref: master
+      ref: main
 
   # What the air is doing, and what is above it. Its own package because
   # nothing in it draws anything or knows what a renderer is — a game running
@@ -49,7 +49,7 @@ dependencies:
     git:
       url: https://github.com/Orblit-Engine/orblit.git
       path: packages/orblit_camera
-      ref: master
+      ref: main
 
   # The examples themselves. A package, because the editor shows the same
   # ones — a gallery whose examples only the gallery could run would be a
@@ -58,13 +58,13 @@ dependencies:
     git:
       url: https://github.com/Orblit-Engine/orblit.git
       path: packages/orblit_examples
-      ref: master
+      ref: main
 
   orblit_weather:
     git:
       url: https://github.com/Orblit-Engine/orblit.git
       path: packages/orblit_weather
-      ref: master
+      ref: main
 
   # The interface layer, from the scripting runtime's repository: a
   # description styled with utility classes or CSS, built as real widgets.
@@ -74,19 +74,19 @@ dependencies:
     git:
       url: https://github.com/Orblit-Engine/orblit-script.git
       path: packages/orblit_script
-      ref: master
+      ref: main
 
   orblit_script_scene:
     git:
       url: https://github.com/Orblit-Engine/orblit-script.git
       path: packages/orblit_script_scene
-      ref: master
+      ref: main
 
   orblit_script_ui:
     git:
       url: https://github.com/Orblit-Engine/orblit-script.git
       path: packages/orblit_script_ui
-      ref: master
+      ref: main
 
   vector_math: ^2.1.4
 
