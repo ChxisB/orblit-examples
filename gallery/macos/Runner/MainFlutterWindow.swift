@@ -35,12 +35,12 @@ class MainFlutterWindow: NSWindow {
       // Where it ended up, for anything driving this from outside — a
       // screenshot in a document, or a build that photographs every example.
       // Behind a variable, so an ordinary run says nothing.
-      if ProcessInfo.processInfo.environment["ORBIS_WINDOW_FRAME"] != nil {
+      if ProcessInfo.processInfo.environment["ORBLIT_WINDOW_FRAME"] != nil {
         let f = frame
         // Reported with the origin at the top left, which is where a screen
         // capture puts it and where a window's own frame does not.
         NSLog(
-          "[orbis] window %d,%d %dx%d", Int(f.minX),
+          "[orblit] window %d,%d %dx%d", Int(f.minX),
           Int(screen.frame.height - f.maxY), Int(f.width), Int(f.height))
       }
     }

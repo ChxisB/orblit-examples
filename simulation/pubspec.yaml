@@ -1,4 +1,4 @@
-name: orbis_simulation_example
+name: orblit_simulation_example
 description: >-
   A headless slice through the whole engine: an ECS world with a transform
   hierarchy, a Dart system running over views, and the result replicated to a
@@ -10,19 +10,19 @@ environment:
   sdk: ^3.10.0
 
 dependencies:
-  orbis_codegen:
+  orblit_codegen:
     git:
-      url: https://github.com/Orbis-Engine/orbis.git
-      path: packages/orbis_codegen
+      url: https://github.com/Orblit-Engine/orblit.git
+      path: packages/orblit_codegen
       ref: master
-  orbis_core:
+  orblit_core:
     git:
-      url: https://github.com/Orbis-Engine/orbis.git
-      path: packages/orbis_core
+      url: https://github.com/Orblit-Engine/orblit.git
+      path: packages/orblit_core
       ref: master
-  orbis_net:
+  orblit_net:
     git:
-      url: https://github.com/Orbis-Engine/orbis-net.git
+      url: https://github.com/Orblit-Engine/orblit-net.git
       ref: master
 
 dev_dependencies:

@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
-import 'package:orbis_net/orbis_net.dart';
-import 'package:orbis_simulation_example/simulation.dart';
+import 'package:orblit_net/orblit_net.dart';
+import 'package:orblit_simulation_example/simulation.dart';
 import 'package:test/test.dart';
 
 Future<void> settle() => Future<void>.delayed(Duration.zero);

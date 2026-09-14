@@ -1,6 +1,6 @@
 {
   "formatVersion": 1,
-  "package": "orbis_simulation_example",
+  "package": "orblit_simulation_example",
   "components": [
     {
       "name": "NetworkId",

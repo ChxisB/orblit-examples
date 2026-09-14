@@ -12,7 +12,7 @@
 // object and the interface is described again whenever it changes, which is
 // exactly what `build` does on every setState.
 
-import { mount, type Handler } from "orbis";
+import { mount, type Handler } from "orblit";
 
 /** What the game knows. The host writes into this; the interface reads it. */
 export const state = {

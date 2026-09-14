@@ -5,10 +5,10 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:orbis_filament/orbis_filament.dart';
-import 'package:orbis_script/orbis_script.dart';
+import 'package:orblit_filament/orblit_filament.dart';
+import 'package:orblit_script/orblit_script.dart';
 
-import 'package:orbis_examples/orbis_examples.dart';
+import 'package:orblit_examples/orblit_examples.dart';
 
 import 'src/examples/interface.dart';
 import 'src/examples/interface_native.dart';
@@ -16,7 +16,7 @@ import 'src/examples/spawning.dart';
 
 /// Every example the gallery shows, in the order it shows them.
 ///
-/// Most of them come from `orbis_examples`, which the editor shows too. The
+/// Most of them come from `orblit_examples`, which the editor shows too. The
 /// three here need the scripting runtime, and live beside it rather than in
 /// that package: putting them there would mean every host of it building
 /// QuickJS to show eleven examples that never touch it.
@@ -53,7 +53,7 @@ class GalleryApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Orbis Examples',
+      title: 'Orblit Examples',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
@@ -94,9 +94,9 @@ class _GalleryState extends State<Gallery> with SingleTickerProviderStateMixin {
   );
 
   static final String? _wanted =
-      const String.fromEnvironment('ORBIS_EXAMPLE').isEmpty
-          ? Platform.environment['ORBIS_EXAMPLE']
-          : const String.fromEnvironment('ORBIS_EXAMPLE');
+      const String.fromEnvironment('ORBLIT_EXAMPLE').isEmpty
+          ? Platform.environment['ORBLIT_EXAMPLE']
+          : const String.fromEnvironment('ORBLIT_EXAMPLE');
   late GalleryCamera _camera = GalleryCamera.from(_showing.viewpoint);
 
   /// One clock for the lot.
@@ -226,7 +226,7 @@ class _GalleryState extends State<Gallery> with SingleTickerProviderStateMixin {
           _dragging = details.localPosition;
         },
         onPanEnd: (_) => _dragging = null,
-        child: OrbisView(
+        child: OrblitView(
           scene: _showing.scene(_camera.toRenderCamera(), _seconds),
           onViewport: (id) {
             // The benchmark asks the renderer what a frame costs, and only
@@ -274,7 +274,7 @@ class _ExampleList extends StatelessWidget {
           const Padding(
             padding: EdgeInsets.fromLTRB(16, 6, 16, 14),
             child: Text(
-              'ORBIS',
+              'ORBLIT',
               style: TextStyle(
                 fontSize: 12,
                 letterSpacing: 3,

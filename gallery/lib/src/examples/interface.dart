@@ -2,12 +2,12 @@ import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:orbis_filament/orbis_filament.dart';
-import 'package:orbis_script/orbis_script.dart';
-import 'package:orbis_script_ui/orbis_script_ui.dart';
+import 'package:orblit_filament/orblit_filament.dart';
+import 'package:orblit_script/orblit_script.dart';
+import 'package:orblit_script_ui/orblit_script_ui.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
 
-import 'package:orbis_examples/orbis_examples.dart';
+import 'package:orblit_examples/orblit_examples.dart';
 import 'scripts.g.dart';
 
 /// An interface over a running scene, written in TypeScript.
@@ -93,7 +93,7 @@ class InterfaceExample extends Example {
       // The interface library first: the elements, both JSX factories, and the
       // small module registry that lets a file compiled straight from
       // TypeScript run without being bundled.
-      ..eval(UiRuntime.source, fileName: 'orbis/ui.js');
+      ..eval(UiRuntime.source, fileName: 'orblit/ui.js');
 
     // Then the game's own file, kept under a name so that what it exports can
     // be reached: its state lives in a module, and the settings write into it.
@@ -111,7 +111,7 @@ class InterfaceExample extends Example {
   /// and nothing on this side holds the state it is built from.
   UiNode get description {
     try {
-      return UiNode.decode(host.eval('__orbis_ui.render()'));
+      return UiNode.decode(host.eval('__orblit_ui.render()'));
     } on ScriptError catch (error) {
       // A script that stops should say so where somebody can read it, rather
       // than leaving a blank corner of the screen and no reason for it.
@@ -135,11 +135,11 @@ class InterfaceExample extends Example {
   }
 
   @override
-  OrbisScene scene(OrbisCamera camera, double seconds) {
-    return OrbisScene(
+  OrblitScene scene(OrblitCamera camera, double seconds) {
+    return OrblitScene(
       objects: [
         for (var i = 0; i < 4; i++)
-          OrbisObject(
+          OrblitObject(
             key: 700 + i,
             transform: Matrix4.identity()
               ..setTranslation(Vector3(
@@ -153,7 +153,7 @@ class InterfaceExample extends Example {
               i.isEven ? const Color(0xFFD9634F) : const Color(0xFF5FA8D3),
             ),
           ),
-        OrbisObject(
+        OrblitObject(
           key: 690,
           transform: Matrix4.identity()
             ..setTranslation(Vector3(0, -1.7, 0))
@@ -163,16 +163,16 @@ class InterfaceExample extends Example {
         ),
       ],
       lights: [
-        OrbisLight(
+        OrblitLight(
           key: 710,
-          kind: OrbisLightKind.directional,
+          kind: OrblitLightKind.directional,
           intensity: 74000,
           direction: Vector3(-0.4, -1, -0.45)..normalize(),
           colour: linearOf(const Color(0xFFFFF3E0)),
           sunAngularRadius: 1.5,
         ),
       ],
-      sky: OrbisSky(colour: linearOf(const Color(0xFF161C25)), ambient: 11000),
+      sky: OrblitSky(colour: linearOf(const Color(0xFF161C25)), ambient: 11000),
       camera: camera,
     );
   }
@@ -260,7 +260,7 @@ class InterfaceExample extends Example {
 // and loaded into the engine's script host; nothing on the Dart side builds
 // an element.
 
-import { mount } from "orbis";
+import { mount } from "orblit";
 
 const state = { hull: 0.72, score: 1840, accent: "ember" };
 

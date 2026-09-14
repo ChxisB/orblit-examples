@@ -4,7 +4,7 @@
 // a widget — it is the same description the engine takes for any interface,
 // and the same class names.
 
-import { mount, type Handler } from "orbis";
+import { mount, type Handler } from "orblit";
 
 export const state = {
   chosen: "Resume",

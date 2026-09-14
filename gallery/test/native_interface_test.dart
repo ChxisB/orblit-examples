@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:orbis_gallery/src/examples/interface_native.dart';
-import 'package:orbis_script_ui/orbis_script_ui.dart';
+import 'package:orblit_gallery/src/examples/interface_native.dart';
+import 'package:orblit_script_ui/orblit_script_ui.dart';
 
 /// The Dart-built interface draws too, and by the same route.
 ///

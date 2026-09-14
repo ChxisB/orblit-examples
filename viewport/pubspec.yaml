@@ -1,4 +1,4 @@
-name: orbis_viewport
+name: orblit_viewport
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -31,10 +31,10 @@ dependencies:
   flutter:
     sdk: flutter
 
-  orbis_filament:
+  orblit_filament:
     git:
-      url: https://github.com/Orbis-Engine/orbis.git
-      path: packages/orbis_filament
+      url: https://github.com/Orblit-Engine/orblit.git
+      path: packages/orblit_filament
       ref: master
 
   # The following adds the Cupertino Icons font to your application.

@@ -1,6 +1,6 @@
-# orbis-examples
+# orblit-examples
 
-Worked examples of what [Orbis](https://github.com/Orbis-Engine/orbis) can do,
+Worked examples of what [Orblit](https://github.com/Orblit-Engine/orblit) can do,
 and how. Each one is small enough to read in a sitting and does one thing
 properly, rather than being a game with the technique buried in it.
 
@@ -26,7 +26,7 @@ dart run simulation/bin/simulation.dart
 Each example in it is one file and stands on its own: what it needs to work
 is what is written in it, and that is what the panel on the right shows.
 
-Most of them live in the engine's own `orbis_examples` package rather than
+Most of them live in the engine's own `orblit_examples` package rather than
 here, because the editor shows the same ones beside the projects somebody is
 working on — an example written twice is an example that drifts. What stays
 here are the three that run TypeScript, beside the scripting runtime they
@@ -44,7 +44,7 @@ surface they draw on.
 | A thousand objects | A whole scene sent every frame, and only what moved paid for. |
 | Meshes | A glTF file, loaded once and instanced, with failures reported back. |
 
-`ORBIS_EXAMPLE=weather` opens on one of them by name, for a screenshot or a
+`ORBLIT_EXAMPLE=weather` opens on one of them by name, for a screenshot or a
 demo that should start where it means to.
 
 ## Why these run against git dependencies

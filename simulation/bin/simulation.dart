@@ -1,4 +1,4 @@
-import 'package:orbis_simulation_example/simulation.dart';
+import 'package:orblit_simulation_example/simulation.dart';
 
 /// Runs the slice and prints where things ended up, so the engine can be
 /// exercised without a window.

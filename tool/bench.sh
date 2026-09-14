@@ -10,13 +10,13 @@
 # compilation, texture uploads and a cold cache, and reporting those as the
 # cost of a frame is how a measurement lies.
 EX="$1"; SECS="${2:-30}"
-cd ~/development/projects/Personal/orbis-examples/gallery
+cd ~/development/projects/Personal/orblit-examples/gallery
 rm -f /tmp/bench.log
-ORBIS_PACE=1 ORBIS_EXAMPLE="$EX" ./build/macos/Build/Products/Debug/orbis_gallery.app/Contents/MacOS/orbis_gallery > /tmp/bench.log 2>&1 &
+ORBLIT_PACE=1 ORBLIT_EXAMPLE="$EX" ./build/macos/Build/Products/Debug/orblit_gallery.app/Contents/MacOS/orblit_gallery > /tmp/bench.log 2>&1 &
 sleep 4
-osascript -e 'tell application "System Events" to set frontmost of first process whose name contains "orbis_gallery" to true' 2>/dev/null
+osascript -e 'tell application "System Events" to set frontmost of first process whose name contains "orblit_gallery" to true' 2>/dev/null
 sleep "$SECS"
-pkill -f orbis_gallery; sleep 1
+pkill -f orblit_gallery; sleep 1
 grep -o "gpu [0-9.]* ms" /tmp/bench.log | awk '{print $2}' | tail -n +4 | sort -n | awk '
   { v[NR]=$1 }
   END {

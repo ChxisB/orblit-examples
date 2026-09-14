@@ -22,12 +22,12 @@ cd "$(dirname "$0")/.."
 
 resolve() { (cd "$1" 2>/dev/null && pwd) || echo ""; }
 
-ENGINE=$(resolve "${1:-../orbis}")
-NET=$(resolve "${2:-../orbis-net}")
-SCRIPT=$(resolve "${3:-../orbis-script}")
+ENGINE=$(resolve "${1:-../orblit}")
+NET=$(resolve "${2:-../orblit-net}")
+SCRIPT=$(resolve "${3:-../orblit-script}")
 
 if [ -z "$ENGINE" ]; then
-  echo "No engine checkout at ${1:-../orbis}. Clone Orbis-Engine/orbis beside this one."
+  echo "No engine checkout at ${1:-../orblit}. Clone Orblit-Engine/orblit beside this one."
   exit 1
 fi
 
@@ -38,18 +38,18 @@ if [ -n "$NET" ]; then
   cat > simulation/pubspec_overrides.yaml <<YAML
 # Written by tool/link_local.sh. Not committed.
 dependency_overrides:
-  orbis_core:
-    path: $ENGINE/packages/orbis_core
-  orbis_codegen:
-    path: $ENGINE/packages/orbis_codegen
-  orbis_net:
+  orblit_core:
+    path: $ENGINE/packages/orblit_core
+  orblit_codegen:
+    path: $ENGINE/packages/orblit_codegen
+  orblit_net:
     path: $NET
 YAML
   (cd simulation && dart pub get > /dev/null)
   printf '  %-10s -> %s, %s\n' simulation "$ENGINE" "$NET"
 else
   rm -f simulation/pubspec_overrides.yaml
-  echo "  simulation skipped: no networking checkout at ${2:-../orbis-net}"
+  echo "  simulation skipped: no networking checkout at ${2:-../orblit-net}"
 fi
 
 # The gallery shows the scripted examples, so it needs scripting as well.
@@ -57,34 +57,34 @@ if [ -n "$SCRIPT" ]; then
   cat > gallery/pubspec_overrides.yaml <<YAML
 # Written by tool/link_local.sh. Not committed.
 dependency_overrides:
-  orbis_camera:
-    path: $ENGINE/packages/orbis_camera
-  orbis_examples:
-    path: $ENGINE/packages/orbis_examples
-  orbis_filament:
-    path: $ENGINE/packages/orbis_filament
-  orbis_light:
-    path: $ENGINE/packages/orbis_light
-  orbis_weather:
-    path: $ENGINE/packages/orbis_weather
-  orbis_script:
-    path: $SCRIPT/packages/orbis_script
-  orbis_script_scene:
-    path: $SCRIPT/packages/orbis_script_scene
-  orbis_script_ui:
-    path: $SCRIPT/packages/orbis_script_ui
+  orblit_camera:
+    path: $ENGINE/packages/orblit_camera
+  orblit_examples:
+    path: $ENGINE/packages/orblit_examples
+  orblit_filament:
+    path: $ENGINE/packages/orblit_filament
+  orblit_light:
+    path: $ENGINE/packages/orblit_light
+  orblit_weather:
+    path: $ENGINE/packages/orblit_weather
+  orblit_script:
+    path: $SCRIPT/packages/orblit_script
+  orblit_script_scene:
+    path: $SCRIPT/packages/orblit_script_scene
+  orblit_script_ui:
+    path: $SCRIPT/packages/orblit_script_ui
 YAML
   linked+=(gallery)
 else
   rm -f gallery/pubspec_overrides.yaml
-  echo "  gallery skipped: no scripting checkout at ${3:-../orbis-script}"
+  echo "  gallery skipped: no scripting checkout at ${3:-../orblit-script}"
 fi
 
 cat > viewport/pubspec_overrides.yaml <<YAML
 # Written by tool/link_local.sh. Not committed.
 dependency_overrides:
-  orbis_filament:
-    path: $ENGINE/packages/orbis_filament
+  orblit_filament:
+    path: $ENGINE/packages/orblit_filament
 YAML
 linked+=(viewport)
 

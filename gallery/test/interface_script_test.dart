@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:orbis_gallery/src/examples/interface.dart';
-import 'package:orbis_script_ui/orbis_script_ui.dart';
+import 'package:orblit_gallery/src/examples/interface.dart';
+import 'package:orblit_script_ui/orblit_script_ui.dart';
 
 /// The interface example really is driven by its TypeScript.
 ///
@@ -56,7 +56,7 @@ void main() {
       expect(_textsIn(example.description), contains('50%'));
 
       // Straight into QuickJS, into the arrow function written in the .tsx.
-      example.host.eval('__orbis_ui.dispatch("$handler")');
+      example.host.eval('__orblit_ui.dispatch("$handler")');
 
       // Which raised the hull by the amount that file says, with nothing on
       // this side involved in the arithmetic or holding the result.

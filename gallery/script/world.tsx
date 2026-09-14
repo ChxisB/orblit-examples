@@ -5,7 +5,7 @@
 // same as the interface. A message that says everything cannot go stale, and
 // nothing has to remember what it told the renderer last time.
 
-import { spawn, destroy, all, count, clear, onFrame } from "orbis/scene";
+import { spawn, destroy, all, count, clear, onFrame } from "orblit/scene";
 
 const colours = ["#D9634F", "#5FA8D3", "#7FB069", "#E0B252", "#B48EAD"];
 

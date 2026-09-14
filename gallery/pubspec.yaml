@@ -1,5 +1,5 @@
-name: orbis_gallery
-description: "Worked examples of what the Orbis engine does, and how."
+name: orblit_gallery
+description: "Worked examples of what the Orblit engine does, and how."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -34,10 +34,10 @@ dependencies:
   # The renderer. A git dependency so the examples build for anybody who
   # clones only this repository; tool/link_local.sh points it at a sibling
   # checkout while somebody is working on the engine itself.
-  orbis_filament:
+  orblit_filament:
     git:
-      url: https://github.com/Orbis-Engine/orbis.git
-      path: packages/orbis_filament
+      url: https://github.com/Orblit-Engine/orblit.git
+      path: packages/orblit_filament
       ref: master
 
   # What the air is doing, and what is above it. Its own package because
@@ -45,47 +45,47 @@ dependencies:
   # on a console has the same weather as one running in the editor.
   # Cameras as shots rather than as objects: a scene holds as many as it has
   # situations, and the brain picks between them.
-  orbis_camera:
+  orblit_camera:
     git:
-      url: https://github.com/Orbis-Engine/orbis.git
-      path: packages/orbis_camera
+      url: https://github.com/Orblit-Engine/orblit.git
+      path: packages/orblit_camera
       ref: master
 
   # The examples themselves. A package, because the editor shows the same
   # ones — a gallery whose examples only the gallery could run would be a
   # gallery nobody sees while they are working.
-  orbis_examples:
+  orblit_examples:
     git:
-      url: https://github.com/Orbis-Engine/orbis.git
-      path: packages/orbis_examples
+      url: https://github.com/Orblit-Engine/orblit.git
+      path: packages/orblit_examples
       ref: master
 
-  orbis_weather:
+  orblit_weather:
     git:
-      url: https://github.com/Orbis-Engine/orbis.git
-      path: packages/orbis_weather
+      url: https://github.com/Orblit-Engine/orblit.git
+      path: packages/orblit_weather
       ref: master
 
   # The interface layer, from the scripting runtime's repository: a
   # description styled with utility classes or CSS, built as real widgets.
   # The scripting runtime itself — QuickJS, built as a native asset. The
   # interface example loads real compiled TypeScript into it.
-  orbis_script:
+  orblit_script:
     git:
-      url: https://github.com/Orbis-Engine/orbis-script.git
-      path: packages/orbis_script
+      url: https://github.com/Orblit-Engine/orblit-script.git
+      path: packages/orblit_script
       ref: master
 
-  orbis_script_scene:
+  orblit_script_scene:
     git:
-      url: https://github.com/Orbis-Engine/orbis-script.git
-      path: packages/orbis_script_scene
+      url: https://github.com/Orblit-Engine/orblit-script.git
+      path: packages/orblit_script_scene
       ref: master
 
-  orbis_script_ui:
+  orblit_script_ui:
     git:
-      url: https://github.com/Orbis-Engine/orbis-script.git
-      path: packages/orbis_script_ui
+      url: https://github.com/Orblit-Engine/orblit-script.git
+      path: packages/orblit_script_ui
       ref: master
 
   vector_math: ^2.1.4

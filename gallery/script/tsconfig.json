@@ -14,7 +14,7 @@
 
     // No factory imported in any file: the compiler inserts the call itself.
     "jsx": "react-jsx",
-    "jsxImportSource": "orbis",
+    "jsxImportSource": "orblit",
 
     // The engine's interface library, by its types rather than its sources.
     // A published engine would ship these as an npm package and this would be
@@ -23,18 +23,18 @@
     // this build and recompile a library the engine already carries.
     "baseUrl": ".",
     "paths": {
-      "orbis": ["../../../orbis-script/packages/orbis_script_ui/types/ui"],
-      "orbis/jsx-runtime": [
-        "../../../orbis-script/packages/orbis_script_ui/types/jsx-runtime"
+      "orblit": ["../../../orblit-script/packages/orblit_script_ui/types/ui"],
+      "orblit/jsx-runtime": [
+        "../../../orblit-script/packages/orblit_script_ui/types/jsx-runtime"
       ],
-      "orbis/scene": [
-        "../../../orbis-script/packages/orbis_script_scene/types/scene"
+      "orblit/scene": [
+        "../../../orblit-script/packages/orblit_script_scene/types/scene"
       ]
     }
   },
   "include": [
     "*.tsx",
     "*.ts",
-    "../../../orbis-script/packages/orbis_script_ui/types/jsx.d.ts"
+    "../../../orblit-script/packages/orblit_script_ui/types/jsx.d.ts"
   ]
 }

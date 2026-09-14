@@ -1,5 +1,5 @@
 {
-  "name": "orbis-examples-script",
+  "name": "orblit-examples-script",
   "private": true,
   "description": "The TypeScript in the examples. A game's own script is built exactly like this: compile it, and hand the result to the engine's script host.",
   "scripts": {

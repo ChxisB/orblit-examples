@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:orbis_filament/orbis_filament.dart';
-import 'package:orbis_gallery/main.dart' show galleryExamples;
+import 'package:orblit_filament/orblit_filament.dart';
+import 'package:orblit_gallery/main.dart' show galleryExamples;
 import 'package:vector_math/vector_math_64.dart' hide Colors;
 
 /// Every example, put through what the gallery does to it.
@@ -14,7 +14,7 @@ import 'package:vector_math/vector_math_64.dart' hide Colors;
 /// is doing something silly. Neither shows up in a screenshot of a different
 /// example.
 void main() {
-  final camera = OrbisCamera(
+  final camera = OrblitCamera(
     position: Vector3(0, 4, 14),
     target: Vector3.zero(),
   );
@@ -151,7 +151,7 @@ void main() {
 const _drawsItsOwn = {'Materials', 'Blending'};
 
 /// Every texture in a scene that the example wrote itself.
-Set<String> _selfDrawn(OrbisScene scene, String temp) {
+Set<String> _selfDrawn(OrblitScene scene, String temp) {
   final paths = <String>{};
   for (final material in scene.materials) {
     for (final texture in [

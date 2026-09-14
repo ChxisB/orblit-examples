@@ -1,10 +1,10 @@
 import 'dart:math' as math;
 import 'dart:typed_data';
 
-import 'package:orbis_core/orbis_core.dart';
-import 'package:orbis_net/orbis_net.dart';
+import 'package:orblit_core/orblit_core.dart';
+import 'package:orblit_net/orblit_net.dart';
 
-import 'orbis_components.g.dart';
+import 'orblit_components.g.dart';
 
 /// A small world that exercises the parts of the engine that have to agree:
 /// storage, the transform hierarchy, a system written in Dart over views, and

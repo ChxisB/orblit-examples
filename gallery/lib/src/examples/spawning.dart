@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:orbis_filament/orbis_filament.dart';
-import 'package:orbis_script/orbis_script.dart';
-import 'package:orbis_script_scene/orbis_script_scene.dart';
+import 'package:orblit_filament/orblit_filament.dart';
+import 'package:orblit_script/orblit_script.dart';
+import 'package:orblit_script_scene/orblit_script_scene.dart';
 import 'package:vector_math/vector_math_64.dart' hide Colors;
 
-import 'package:orbis_examples/orbis_examples.dart';
+import 'package:orblit_examples/orblit_examples.dart';
 import 'scripts.g.dart';
 
 /// A world put together in TypeScript.
@@ -38,9 +38,9 @@ class SpawningExample extends Example {
     if (running != null) return running;
 
     final started = ScriptHost()
-      // The scene runtime: spawn, destroy, and the `__orbis_scene` object the
+      // The scene runtime: spawn, destroy, and the `__orblit_scene` object the
       // host asks for a frame through.
-      ..eval(SceneRuntime.source, fileName: 'orbis/scene.js');
+      ..eval(SceneRuntime.source, fileName: 'orblit/scene.js');
 
     // The game's own file, kept under a name so its settings can be reached.
     started.eval(
@@ -78,22 +78,22 @@ class SpawningExample extends Example {
       host.eval('require("world").settings.$name = $value;');
 
   @override
-  OrbisScene scene(OrbisCamera camera, double seconds) {
+  OrblitScene scene(OrblitCamera camera, double seconds) {
     late final List<ScriptedThing> world;
     try {
       // One call: run the script's step, and take back everything in the
       // world. Nothing on this side knows what moved.
       world = ScriptedThing.decodeAll(
-        host.eval('__orbis_scene.frame($seconds)'),
+        host.eval('__orblit_scene.frame($seconds)'),
       );
     } on ScriptError {
       world = const [];
     }
 
-    return OrbisScene(
+    return OrblitScene(
       objects: [
         for (final (index, thing) in world.indexed)
-          OrbisObject(
+          OrblitObject(
             // The renderer keeps what it built against a number, and script
             // names things with words. One stands for the other for as long
             // as the world holds still, which between two frames it does.
@@ -105,7 +105,7 @@ class SpawningExample extends Example {
             colour: linearOf(Color(0xFF000000 | thing.colour)),
             mesh: thing.mesh,
           ),
-        OrbisObject(
+        OrblitObject(
           key: 790,
           transform: Matrix4.identity()
             ..setTranslation(Vector3(0, -1.15, 0))
@@ -115,16 +115,16 @@ class SpawningExample extends Example {
         ),
       ],
       lights: [
-        OrbisLight(
+        OrblitLight(
           key: 810,
-          kind: OrbisLightKind.directional,
+          kind: OrblitLightKind.directional,
           intensity: 76000,
           direction: Vector3(-0.4, -0.92, -0.35)..normalize(),
           colour: linearOf(const Color(0xFFFFF3E0)),
           sunAngularRadius: 1.2,
         ),
       ],
-      sky: OrbisSky(
+      sky: OrblitSky(
         colour: linearOf(const Color(0xFF6E8DB4)),
         zenith: linearOf(const Color(0xFF2F5F97)),
         horizon: linearOf(const Color(0xFFB9CBDD)),
@@ -133,7 +133,7 @@ class SpawningExample extends Example {
         bodyColour: linearOf(const Color(0xFFFFF6E8)),
         bodySize: 0.011,
         quality: SkyQuality.fair,
-        clouds: OrbisClouds.cumulus(cover: 0.3, wind: Vector2(4, 1.5)),
+        clouds: OrblitClouds.cumulus(cover: 0.3, wind: Vector2(4, 1.5)),
       ),
       camera: camera,
     );
@@ -194,7 +194,7 @@ class SpawningExample extends Example {
   String get code => '''
 // script/world.tsx — every object in the scene, and everything that moves.
 
-import { spawn, all, clear } from "orbis/scene";
+import { spawn, all, clear } from "orblit/scene";
 
 export const settings = { rings: 4, spin: 0.35, bob: true };
 

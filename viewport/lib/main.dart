@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:orbis_filament/orbis_filament.dart';
+import 'package:orblit_filament/orblit_filament.dart';
 
 void main() => runApp(const ViewportApp());
 
@@ -9,7 +9,7 @@ class ViewportApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Orbis Viewport',
+      title: 'Orblit Viewport',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
@@ -60,7 +60,7 @@ class _ViewportPageState extends State<ViewportPage> {
                       child: Stack(
                         fit: StackFit.expand,
                         children: [
-                          const OrbisView(),
+                          const OrblitView(),
                           if (_showOverlay)
                             const Positioned(
                               left: 14,
@@ -102,7 +102,7 @@ class _TitleBar extends StatelessWidget {
       child: Row(
         children: [
           Text(
-            'Orbis',
+            'Orblit',
             style: Theme.of(context).textTheme.titleMedium
                 ?.copyWith(fontWeight: FontWeight.w700, letterSpacing: -0.3),
           ),
