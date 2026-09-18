@@ -4,41 +4,35 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
 import 'package:orblit_filament/orblit_filament.dart';
 import 'package:orblit_script/orblit_script.dart';
 
 import 'package:orblit_examples/orblit_examples.dart';
 
+import 'src/code_view.dart';
 import 'src/examples/interface.dart';
 import 'src/examples/interface_native.dart';
 import 'src/examples/spawning.dart';
 
-/// Every example the gallery shows, in the order it shows them.
+/// Every example the gallery shows.
 ///
 /// Most of them come from `orblit_examples`, which the editor shows too. The
 /// three here need the scripting runtime, and live beside it rather than in
 /// that package: putting them there would mean every host of it building
 /// QuickJS to show eleven examples that never touch it.
 ///
+/// Where they appear is decided by the section each one names, not by where
+/// it sits in this list, so the scripting ones can simply go on the end.
+///
 /// A function rather than a field on the app, so that a test can ask for the
 /// same list rather than keeping a copy of it — a copy is how a test ends up
 /// passing for an example nobody can reach.
-List<Example> galleryExamples() {
-  final engine = engineExamples();
-
-  // The scripting ones go after the weather, where they were: the order is
-  // the order somebody should meet them in, and it does not change because
-  // some of them moved house.
-  final after = engine.indexWhere((e) => e is WeatherExample) + 1;
-  return [
-    ...engine.take(after),
-    InterfaceExample(),
-    NativeInterfaceExample(),
-    SpawningExample(),
-    ...engine.skip(after),
-  ];
-}
+List<Example> galleryExamples() => [
+  ...engineExamples(),
+  InterfaceExample(),
+  NativeInterfaceExample(),
+  SpawningExample(),
+];
 
 void main() => runApp(const GalleryApp());
 
@@ -248,8 +242,10 @@ class _GalleryState extends State<Gallery> with SingleTickerProviderStateMixin {
   }
 }
 
-/// The list on the left.
-class _ExampleList extends StatelessWidget {
+/// The list on the left, under a heading for each part of the engine.
+///
+/// A heading opens or folds when clicked, and more than one can be open.
+class _ExampleList extends StatefulWidget {
   const _ExampleList({
     required this.examples,
     required this.showing,
@@ -259,6 +255,16 @@ class _ExampleList extends StatelessWidget {
   final List<Example> examples;
   final Example showing;
   final ValueChanged<Example> onShow;
+
+  @override
+  State<_ExampleList> createState() => _ExampleListState();
+}
+
+class _ExampleListState extends State<_ExampleList> {
+  /// The headings opened out. Only the one holding the example on screen, to
+  /// start with: every heading and its count then fits in the window at once,
+  /// which says what is here better than forty rows somebody has to scroll.
+  late final Set<ExampleSection> _open = {widget.showing.section};
 
   @override
   Widget build(BuildContext context) {
@@ -283,13 +289,92 @@ class _ExampleList extends StatelessWidget {
               ),
             ),
           ),
-          for (final example in examples)
-            _ListRow(
-              example: example,
-              selected: identical(example, showing),
-              onTap: () => onShow(example),
+          for (final (section, examples)
+              in examplesBySection(widget.examples)) ...[
+            _SectionHeading(
+              section: section,
+              count: examples.length,
+              folded: !_open.contains(section),
+              // Said on the heading, because once it is folded the row that
+              // would have said so is not there.
+              holdsShowing: examples.any((e) => identical(e, widget.showing)),
+              onTap: () => setState(() {
+                if (!_open.remove(section)) _open.add(section);
+              }),
             ),
+            if (_open.contains(section))
+              for (final example in examples)
+                _ListRow(
+                  example: example,
+                  selected: identical(example, widget.showing),
+                  onTap: () => widget.onShow(example),
+                ),
+          ],
         ],
+      ),
+    );
+  }
+}
+
+/// A heading over a group of examples, and the way to fold it away.
+class _SectionHeading extends StatelessWidget {
+  const _SectionHeading({
+    required this.section,
+    required this.count,
+    required this.folded,
+    required this.holdsShowing,
+    required this.onTap,
+  });
+
+  final ExampleSection section;
+  final int count;
+  final bool folded;
+  final bool holdsShowing;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    const quiet = Color(0xFF5C6472);
+
+    return Semantics(
+      button: true,
+      expanded: !folded,
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 16, 14, 6),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    section.label.toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      letterSpacing: 1.4,
+                      fontWeight: FontWeight.w600,
+                      color: folded && holdsShowing
+                          ? const Color(0xFFC25E22)
+                          : const Color(0xFF8A95A6),
+                    ),
+                  ),
+                ),
+                Text(
+                  '$count',
+                  style: const TextStyle(fontSize: 11, color: quiet),
+                ),
+                const SizedBox(width: 2),
+                Icon(
+                  folded ? Icons.chevron_right : Icons.expand_more,
+                  size: 16,
+                  color: quiet,
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -383,7 +468,9 @@ class _Panel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 380,
+      // Wide enough for most lines of code to fit as written; the rest are
+      // broken to fit by the code view, and it opens wider on request.
+      width: 420,
       decoration: const BoxDecoration(
         color: Color(0xFF141922),
         border: Border(left: BorderSide(color: Color(0xFF232B36))),
@@ -395,7 +482,7 @@ class _Panel extends StatelessWidget {
           example.settings(context, onChanged),
           const SizedBox(height: 20),
           const _PanelTitle('How it is written'),
-          _Code(example.code),
+          CodeView(example.code, title: example.name),
         ],
       ),
     );
@@ -420,50 +507,6 @@ class _PanelTitle extends StatelessWidget {
           color: Color(0xFF6E7A8C),
         ),
       ),
-    );
-  }
-}
-
-class _Code extends StatelessWidget {
-  const _Code(this.source);
-
-  final String source;
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color(0xFF0D1117),
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: const Color(0xFF232B36)),
-          ),
-          child: SelectableText(
-            source.trim(),
-            style: const TextStyle(
-              fontFamily: 'Menlo',
-              fontSize: 11,
-              height: 1.5,
-              color: Color(0xFFC5CDD8),
-            ),
-          ),
-        ),
-        Positioned(
-          top: 4,
-          right: 4,
-          child: IconButton(
-            iconSize: 14,
-            tooltip: 'Copy',
-            icon: const Icon(Icons.copy_all_outlined),
-            color: const Color(0xFF6E7A8C),
-            onPressed: () =>
-                Clipboard.setData(ClipboardData(text: source.trim())),
-          ),
-        ),
-      ],
     );
   }
 }

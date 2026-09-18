@@ -25,6 +25,9 @@ class InterfaceExample extends Example {
   String get name => 'An interface in TypeScript';
 
   @override
+  ExampleSection get section => ExampleSection.scripting;
+
+  @override
   String get blurb =>
       'Two interfaces written in .tsx, running in the engine, drawn by Flutter.';
 

@@ -27,6 +27,9 @@ class NativeInterfaceExample extends Example {
   String get name => 'An interface in Dart';
 
   @override
+  ExampleSection get section => ExampleSection.scripting;
+
+  @override
   String get blurb =>
       'The same description, built directly, with no script in the way.';
 

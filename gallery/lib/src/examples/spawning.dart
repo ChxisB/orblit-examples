@@ -24,6 +24,9 @@ class SpawningExample extends Example {
   String get name => 'Spawning from script';
 
   @override
+  ExampleSection get section => ExampleSection.scripting;
+
+  @override
   String get blurb =>
       'Every object put there by TypeScript, and moved by it every frame.';
 
