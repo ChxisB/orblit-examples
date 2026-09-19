@@ -56,5 +56,9 @@ committed — so nothing ships wired to a path on one machine.
 
 ## Licence
 
-MIT, © 2026 Chris Beckett. The gallery and the viewport link the renderer, so builds
-carry Filament's Apache 2.0 licence too — see [LICENSE](LICENSE).
+FSL-1.1-MIT, © 2026 Chris Beckett — use it, fork it and ship games with it,
+commercial ones included, but don't offer it as a competing product. Each
+release becomes MIT two years after it's published.
+
+The gallery and the viewport link the renderer, so builds carry Filament's
+Apache 2.0 licence too — see [LICENSE](LICENSE).
