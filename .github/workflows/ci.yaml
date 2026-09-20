@@ -111,6 +111,13 @@ jobs:
         working-directory: orblit-examples
         run: ./tool/link_local.sh ../orblit ../orblit-net ../orblit-script
 
+      # Analyzed and tested here rather than in the job above, which runs on
+      # Linux and cannot resolve this app's renderer dependency at all. A
+      # build alone does not read test/, so a broken test sat here unnoticed.
+      - name: Check the viewport
+        working-directory: orblit-examples/viewport
+        run: flutter analyze && flutter test
+
       - name: Build the viewport
         working-directory: orblit-examples/viewport
         run: flutter build macos --debug
@@ -123,6 +130,10 @@ jobs:
       # already broken this job once.
       #
       # What is this repository's business is that its apps build.
+
+      - name: Check the gallery
+        working-directory: orblit-examples/gallery
+        run: flutter analyze && flutter test
 
       - name: Build the gallery
         working-directory: orblit-examples/gallery
