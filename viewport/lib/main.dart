@@ -131,11 +131,14 @@ class _Panel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 8, 16, 16),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: const Color(0xFF181C23),
+      // A Material rather than a DecoratedBox: the switch below paints its
+      // highlight on the nearest Material ancestor, so a plain coloured box
+      // here would sit on top of it and the tile would never look pressed.
+      child: Material(
+        color: const Color(0xFF181C23),
+        shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color(0xFF2C333E)),
+          side: const BorderSide(color: Color(0xFF2C333E)),
         ),
         child: Padding(
           padding: const EdgeInsets.all(18),

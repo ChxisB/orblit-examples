@@ -1,30 +1,29 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:orblit_viewport/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('the shell draws around the viewport', (tester) async {
+    await tester.pumpWidget(const ViewportApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // The renderer needs a platform channel there is none of under the test
+    // binding, so what is checked here is the chrome the M1 demo is about:
+    // that a Filament view takes part in layout rather than sitting in its
+    // own window on top of everything.
+    expect(find.text('Orblit'), findsOneWidget);
+    expect(find.text('M1 · macOS viewport'), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+  testWidgets('the overlay badge answers its switch', (tester) async {
+    await tester.pumpWidget(const ViewportApp());
+
+    const label = 'Filament → CVPixelBuffer → Texture';
+    expect(find.text(label), findsOneWidget);
+
+    await tester.tap(find.byType(Switch));
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text(label), findsNothing);
   });
 }
