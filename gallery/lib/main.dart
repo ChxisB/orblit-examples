@@ -91,7 +91,49 @@ class _GalleryState extends State<Gallery> with SingleTickerProviderStateMixin {
       const String.fromEnvironment('ORBLIT_EXAMPLE').isEmpty
           ? Platform.environment['ORBLIT_EXAMPLE']
           : const String.fromEnvironment('ORBLIT_EXAMPLE');
+
+  /// Whether to show the scene and nothing else.
+  ///
+  /// The list, the header, the settings and the code are the point of the
+  /// gallery and exactly the wrong thing in a picture of what the renderer
+  /// draws: a clip of a lit room should not be four fifths chrome. Set
+  /// ORBLIT_BARE=1 and the window is the stage, edge to edge, with no
+  /// rounded corner or padding to crop back off afterwards.
+  ///
+  /// Whatever the example draws over its scene stays, because for the ones
+  /// that have an overlay — the interfaces, which are the whole point of
+  /// those examples — the overlay is the scene as far as a viewer is
+  /// concerned.
+  static final bool _bare =
+      (const String.fromEnvironment('ORBLIT_BARE').isEmpty
+          ? Platform.environment['ORBLIT_BARE']
+          : const String.fromEnvironment('ORBLIT_BARE')) ==
+      '1';
+
+  /// How fast the camera circles the scene on its own, in radians a second.
+  ///
+  /// A still scene under a still camera makes a still clip, and a still clip
+  /// is a screenshot that costs a megabyte. Set ORBLIT_ORBIT and the camera
+  /// turns while it is recorded, which is what the site's clips are.
+  ///
+  /// The angle is worked out from the clock rather than added to each frame.
+  /// Added up frame by frame it would depend on how many frames there were,
+  /// so a clip meant to be exactly one turn would fall a few degrees short or
+  /// long and show a seam every time it looped. From the clock, six seconds
+  /// at a sixth of a turn a second is one turn exactly, whatever the frame
+  /// rate did in between.
+  static final double _orbit = double.tryParse(
+        (const String.fromEnvironment('ORBLIT_ORBIT').isEmpty
+                ? Platform.environment['ORBLIT_ORBIT']
+                : const String.fromEnvironment('ORBLIT_ORBIT')) ??
+            '',
+      ) ??
+      0;
   late GalleryCamera _camera = GalleryCamera.from(_showing.viewpoint);
+
+  /// Where the example pointed the camera before anything turned it, which is
+  /// what _orbit measures its angle from.
+  late double _facing = _camera.yaw;
 
   /// One clock for the lot.
   ///
@@ -135,13 +177,17 @@ class _GalleryState extends State<Gallery> with SingleTickerProviderStateMixin {
       _startedAt = elapsed;
       _restarting = false;
     }
-    setState(() => _seconds = (elapsed - _startedAt).inMicroseconds / 1e6);
+    setState(() {
+      _seconds = (elapsed - _startedAt).inMicroseconds / 1e6;
+      if (_orbit != 0) _camera.yaw = _facing + _orbit * _seconds;
+    });
   }
 
   void _show(Example example) {
     setState(() {
       _showing = example;
       _camera = GalleryCamera.from(example.viewpoint);
+      _facing = _camera.yaw;
       _restarting = true;
       _seconds = 0;
     });
@@ -156,6 +202,14 @@ class _GalleryState extends State<Gallery> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final available = !kIsWeb && defaultTargetPlatform == TargetPlatform.macOS;
+
+    // Nothing but the scene: see _bare.
+    if (_bare) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: _scene(available),
+      );
+    }
 
     return Scaffold(
       body: Row(
@@ -176,22 +230,7 @@ class _GalleryState extends State<Gallery> with SingleTickerProviderStateMixin {
                     padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Stack(
-                        children: [
-                          Positioned.fill(
-                            child:
-                                available ? _stage() : const _Unavailable(),
-                          ),
-                          // Whatever the example draws over its scene, which
-                          // for most of them is nothing.
-                          if (_showing.overlay(
-                                context,
-                                () => setState(() {}),
-                              )
-                              case final over?)
-                            Positioned.fill(child: over),
-                        ],
-                      ),
+                      child: _scene(available),
                     ),
                   ),
                 ),
@@ -201,6 +240,18 @@ class _GalleryState extends State<Gallery> with SingleTickerProviderStateMixin {
           _Panel(example: _showing, onChanged: () => setState(() {})),
         ],
       ),
+    );
+  }
+
+  /// The scene, and whatever the example draws over it — which for most of
+  /// them is nothing.
+  Widget _scene(bool available) {
+    return Stack(
+      children: [
+        Positioned.fill(child: available ? _stage() : const _Unavailable()),
+        if (_showing.overlay(context, () => setState(() {})) case final over?)
+          Positioned.fill(child: over),
+      ],
     );
   }
 
@@ -222,6 +273,12 @@ class _GalleryState extends State<Gallery> with SingleTickerProviderStateMixin {
         onPanEnd: (_) => _dragging = null,
         child: OrblitView(
           scene: _showing.scene(_camera.toRenderCamera(), _seconds),
+          // What each model file turned out to hold. The imported-models
+          // example places a file by the bounds that come back here, so
+          // without this every sample is drawn in whatever units it was
+          // made in -- and the Fox is a hundred metres long.
+          onAssetInfo: (info) =>
+              setState(() => _showing.models[info.path] = info),
           onViewport: (id) {
             // The benchmark asks the renderer what a frame costs, and only
             // the view knows which viewport it is.

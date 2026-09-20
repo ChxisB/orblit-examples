@@ -39,9 +39,18 @@ class MainFlutterWindow: NSWindow {
         let f = frame
         // Reported with the origin at the top left, which is where a screen
         // capture puts it and where a window's own frame does not.
-        NSLog(
-          "[orblit] window %d,%d %dx%d", Int(f.minX),
-          Int(screen.frame.height - f.maxY), Int(f.width), Int(f.height))
+        //
+        // On stdout rather than through NSLog, because the only thing that
+        // reads this is a script that launched the binary and is watching its
+        // output. NSLog goes to the unified log, where that script would have
+        // to go looking for it by process and timestamp — and where, from a
+        // release build, it may not arrive at all. Flushed because stdout to
+        // a pipe is block-buffered, and a line that arrives when the app
+        // quits is a line that arrives after the recording.
+        print(
+          "[orblit] window \(Int(f.minX)),\(Int(screen.frame.height - f.maxY)) "
+            + "\(Int(f.width))x\(Int(f.height))")
+        fflush(stdout)
       }
     }
   }
