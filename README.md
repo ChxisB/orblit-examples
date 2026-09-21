@@ -1,8 +1,8 @@
 # orblit-examples
 
 Worked examples of what [Orblit](https://github.com/ChxisB/orblit) can do,
-and how. Each one is small enough to read in a sitting and does one thing
-properly, rather than being a game with the technique buried in it.
+and how. Each one is small enough to read in a sitting, and does one thing
+properly rather than being a game with the technique buried in it.
 
 ```sh
 # Clone the engine and networking beside this one, then:
@@ -12,7 +12,7 @@ properly, rather than being a game with the technique buried in it.
 | Example | What it shows |
 | --- | --- |
 | [`gallery`](gallery) | Every rendering technique, one at a time: pick from the list, change it with the settings, and read the lines that do it. macOS. |
-| [`viewport`](viewport) | A Filament scene composited as an ordinary Flutter widget — it lays out, clips, and sits beside a panel that resizes it. macOS. |
+| [`viewport`](viewport) | A Filament scene drawn as an ordinary Flutter widget. It lays out, it clips, and it sits beside a panel that resizes it. macOS. |
 | [`simulation`](simulation) | The engine with no window: an entity-component world, a transform hierarchy, a system written in Dart over column views, and the result replicated to a second world. |
 
 ```sh
@@ -23,17 +23,16 @@ dart run simulation/bin/simulation.dart
 
 ## The gallery
 
-Each example in it is one file and stands on its own: what it needs to work
-is what is written in it, and that is what the panel on the right shows.
+Each example is one file and stands on its own. What it needs to work is what
+is written in it, and that is what the panel on the right shows.
 
 Most of them live in the engine's own `orblit_examples` package rather than
 here, because the editor shows the same ones beside the projects somebody is
-working on — an example written twice is an example that drifts. What stays
-here are the three that run TypeScript, beside the scripting runtime they
-need: in the shared package they would mean every host of it building QuickJS
-to show eleven examples that never touch it. They
-are not steps in a tutorial and nothing is shared between them but the
-surface they draw on.
+working on. An example written twice is an example that drifts. What stays
+here are the three that run TypeScript, next to the scripting runtime they
+need. In the shared package they would force every host of it to build QuickJS
+just to show eleven examples that never touch it. They are not steps in a
+tutorial, and they share nothing but the surface they draw on.
 
 | | |
 | --- | --- |
@@ -41,26 +40,26 @@ surface they draw on.
 | Lights | Sun, point and spot, in lux and lumens, with the shadows each casts. |
 | Day and night | A sun and a moon crossing the sky, with the camera metered for both. |
 | Weather | Haze, banks of cloud and falling weather, carried by one wind. |
-| A thousand objects | A whole scene sent every frame, and only what moved paid for. |
+| A thousand objects | A whole scene sent every frame. You only pay for what moved. |
 | Meshes | A glTF file, loaded once and instanced, with failures reported back. |
 
-`ORBLIT_EXAMPLE=weather` opens on one of them by name, for a screenshot or a
-demo that should start where it means to.
+`ORBLIT_EXAMPLE=weather` opens on one of them by name, which is handy for a
+screenshot or a demo that should start where it means to.
 
 ## Why these run against git dependencies
 
 The engine, networking and examples are separate repositories, so each example
 declares what it needs by git reference. `tool/link_local.sh` swaps those for
-sibling checkouts while you work, and the overrides it writes are not
-committed — so nothing ships wired to a path on one machine.
+sibling checkouts while you work. The overrides it writes are not committed, so
+nothing ships wired to a path on one machine.
 
 ## Licence
 
-MPL-2.0, © 2026 Chris Beckett — the Mozilla Public License, and open source.
-Use it, fork it and ship games with it, commercial ones included; your game
-stays yours and the licence does not reach into it. What it asks is that
-changes to this repository's own files ship under the same licence, so engine
-work stays in the open.
+MPL-2.0, © 2026 Chris Beckett. That is the Mozilla Public License, and it is
+open source. Use it, fork it and ship games with it, including commercial ones.
+Your game stays yours, and the licence does not reach into it. What it asks is
+that changes to this repository's own files ship under the same licence, so
+engine work stays in the open.
 
 The gallery and the viewport link the renderer, so builds carry Filament's
-Apache 2.0 licence too — see [LICENSE](LICENSE).
+Apache 2.0 licence too. See [LICENSE](LICENSE).
