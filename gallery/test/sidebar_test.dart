@@ -28,16 +28,21 @@ void main() {
     tester,
   ) async {
     await _open(tester);
+    // The heading's first row, since only that one is sure to be on screen.
+    // A new showcase can push the others below the window.
+    final first = galleryExamples()
+        .firstWhere((one) => one.section == ExampleSection.showcases)
+        .name;
 
     await tester.tap(find.text('SHOWCASES'));
     await tester.pump();
-    expect(find.text('Blocks'), findsOneWidget);
+    expect(find.text(first), findsOneWidget);
     // Opening one leaves the others as they were.
     expect(find.text('Virtual cameras'), findsOneWidget);
 
     await tester.tap(find.text('SHOWCASES'));
     await tester.pump();
-    expect(find.text('Blocks'), findsNothing);
+    expect(find.text(first), findsNothing);
   });
 }
 
