@@ -11,7 +11,7 @@ failures=0
 echo "== simulation =="
 (cd simulation && dart pub get > /dev/null 2>&1)
 
-if (cd simulation && dart analyze > /tmp/orblit_ex_analyze.log 2>&1); then
+if (cd simulation && dart analyze --fatal-infos > /tmp/orblit_ex_analyze.log 2>&1); then
   echo "  ok    analyze"
 else
   echo "  FAIL  analyze"; tail -20 /tmp/orblit_ex_analyze.log; failures=$((failures+1))
