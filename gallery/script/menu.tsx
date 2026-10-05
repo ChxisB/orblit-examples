@@ -1,7 +1,7 @@
 // A second interface, to show that the first one was not a special case.
 //
 // A pause menu: a heading, a column of choices, and a footer. Nothing here is
-// a widget — it is the same description the engine takes for any interface,
+// a widget. It is the same description the engine takes for any interface,
 // and the same class names.
 
 import { mount, type Handler } from "orblit";

@@ -259,7 +259,7 @@ class InterfaceExample extends Example {
 
   @override
   String get code => '''
-// script/hud.tsx — the whole of the interface. Compiled by `npm run build`
+// script/hud.tsx is the whole of the interface. Compiled by `npm run build`
 // and loaded into the engine's script host; nothing on the Dart side builds
 // an element.
 

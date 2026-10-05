@@ -1,7 +1,7 @@
 // Putting things in the world from TypeScript.
 //
 // Every object below is spawned by this file. The engine asks for a frame, the
-// step here runs, and what comes back is the whole world — a description, the
+// step here runs, and what comes back is the whole world: a description, the
 // same as the interface. A message that says everything cannot go stale, and
 // nothing has to remember what it told the renderer last time.
 
@@ -67,7 +67,7 @@ export function howMany(): number {
 
 build();
 
-// The step. Everything that moves, moves here — the host only asks for a
+// The step. Everything that moves, moves here. The host only asks for a
 // frame and draws whatever it is told.
 function step(seconds: number) {
   for (const thing of all()) {

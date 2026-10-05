@@ -2,13 +2,13 @@
 //
 // This is the whole of what a game writes. The engine loads the compiled
 // output of this file into its script host, asks it to describe the interface
-// after every event, and builds real Flutter widgets from what comes back —
+// after every event, and builds real Flutter widgets from what comes back,
 // laid out by Flutter, drawn by Impeller. The class names are the ones anybody
 // who has written a web page already knows; what they resolve to is Flutter's
 // own layout rather than a second box model pretending to be the web's.
 //
 // There is no state hook here and no lifecycle. Those exist to drive a
-// reconciler, and the reconciler is on the other side — so state is a plain
+// reconciler, and the reconciler is on the other side, so state is a plain
 // object and the interface is described again whenever it changes, which is
 // exactly what `build` does on every setState.
 

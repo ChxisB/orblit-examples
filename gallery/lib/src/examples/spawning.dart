@@ -195,7 +195,7 @@ class SpawningExample extends Example {
 
   @override
   String get code => '''
-// script/world.tsx — every object in the scene, and everything that moves.
+// script/world.tsx holds every object in the scene, and everything that moves.
 
 import { spawn, all, clear } from "orblit/scene";
 
@@ -223,7 +223,7 @@ export function build() {
   }
 }
 
-// The step. Everything that moves, moves here — the host only asks for a
+// The step. Everything that moves, moves here. The host only asks for a
 // frame and draws whatever it is told.
 export function step(seconds: number) {
   for (const thing of all()) { /* ... */ }
