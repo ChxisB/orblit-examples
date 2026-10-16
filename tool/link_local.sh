@@ -11,7 +11,7 @@
 # and pointing at them is how CI resolves them without handing a runner a
 # deploy key.
 #
-# Usage: link_local.sh [engine] [networking] [scripting]
+# Usage: link_local.sh [engine] [networking] [scripting] [physics]
 #
 # Only the engine is required. An app whose dependencies are not all present is
 # skipped and said so, rather than failing the whole run — somebody building
@@ -25,6 +25,7 @@ resolve() { (cd "$1" 2>/dev/null && pwd) || echo ""; }
 ENGINE=$(resolve "${1:-../orblit}")
 NET=$(resolve "${2:-../orblit-net}")
 SCRIPT=$(resolve "${3:-../orblit-script}")
+PHYSICS=$(resolve "${4:-../orblit-physics}")
 
 if [ -z "$ENGINE" ]; then
   echo "No engine checkout at ${1:-../orblit}. Clone ChxisB/orblit beside this one."
@@ -52,8 +53,9 @@ else
   echo "  simulation skipped: no networking checkout at ${2:-../orblit-net}"
 fi
 
-# The gallery shows the scripted examples, so it needs scripting as well.
-if [ -n "$SCRIPT" ]; then
+# The gallery shows the scripted examples and a cloth, so it needs scripting
+# and physics as well.
+if [ -n "$SCRIPT" ] && [ -n "$PHYSICS" ]; then
   cat > gallery/pubspec_overrides.yaml <<YAML
 # Written by tool/link_local.sh. Not committed.
 dependency_overrides:
@@ -65,6 +67,8 @@ dependency_overrides:
     path: $ENGINE/packages/orblit_filament
   orblit_light:
     path: $ENGINE/packages/orblit_light
+  orblit_stage:
+    path: $ENGINE/packages/orblit_stage
   orblit_weather:
     path: $ENGINE/packages/orblit_weather
   orblit_script:
@@ -73,11 +77,13 @@ dependency_overrides:
     path: $SCRIPT/packages/orblit_script_scene
   orblit_script_ui:
     path: $SCRIPT/packages/orblit_script_ui
+  orblit_physics_soft:
+    path: $PHYSICS/packages/orblit_physics_soft
 YAML
   linked+=(gallery)
 else
   rm -f gallery/pubspec_overrides.yaml
-  echo "  gallery skipped: no scripting checkout at ${3:-../orblit-script}"
+  echo "  gallery skipped: needs scripting at ${3:-../orblit-script} and physics at ${4:-../orblit-physics}"
 fi
 
 cat > viewport/pubspec_overrides.yaml <<YAML

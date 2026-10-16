@@ -76,6 +76,11 @@ jobs:
           path: orblit-net
       # The gallery shows the scripted examples, so scripting has to be here
       # too or its dependencies do not resolve.
+      # The gallery's cloth moves with the physics repository's solver.
+      - uses: actions/checkout@v4
+        with:
+          repository: ChxisB/orblit-physics
+          path: orblit-physics
       - uses: actions/checkout@v4
         with:
           repository: ChxisB/orblit-script
@@ -109,7 +114,7 @@ jobs:
 
       - name: Link local checkouts
         working-directory: orblit-examples
-        run: ./tool/link_local.sh ../orblit ../orblit-net ../orblit-script
+        run: ./tool/link_local.sh ../orblit ../orblit-net ../orblit-script ../orblit-physics
 
       # Analyzed and tested here rather than in the job above, which runs on
       # Linux and cannot resolve this app's renderer dependency at all. A

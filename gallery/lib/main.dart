@@ -10,6 +10,7 @@ import 'package:orblit_script/orblit_script.dart';
 import 'package:orblit_examples/orblit_examples.dart';
 
 import 'src/code_view.dart';
+import 'src/examples/cloth.dart';
 import 'src/examples/interface.dart';
 import 'src/examples/interface_native.dart';
 import 'src/examples/spawning.dart';
@@ -17,9 +18,10 @@ import 'src/examples/spawning.dart';
 /// Every example the gallery shows.
 ///
 /// Most of them come from `orblit_examples`, which the editor shows too. The
-/// three here need the scripting runtime, and live beside it rather than in
-/// that package: putting them there would mean every host of it building
-/// QuickJS to show eleven examples that never touch it.
+/// three scripted ones need the scripting runtime, and the cloth needs the
+/// native physics solver. They live here rather than in that package:
+/// putting them there would mean every host of it building QuickJS and the
+/// solver to show examples that never touch them.
 ///
 /// Where they appear is decided by the section each one names, not by where
 /// it sits in this list, so the scripting ones can simply go on the end.
@@ -29,6 +31,7 @@ import 'src/examples/spawning.dart';
 /// passing for an example nobody can reach.
 List<Example> galleryExamples() => [
   ...engineExamples(),
+  ClothExample(),
   InterfaceExample(),
   NativeInterfaceExample(),
   SpawningExample(),

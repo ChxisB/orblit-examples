@@ -66,6 +66,21 @@ dependencies:
       path: packages/orblit_weather
       ref: main
 
+  # The cloth example draws a sheet skinned to joints, and moves the joints
+  # with a cloth solver. The solver is native, which is why this example is
+  # here and not in orblit_examples, whose examples also run on the web.
+  orblit_stage:
+    git:
+      url: https://github.com/ChxisB/orblit.git
+      path: packages/orblit_stage
+      ref: main
+
+  orblit_physics_soft:
+    git:
+      url: https://github.com/ChxisB/orblit-physics.git
+      path: packages/orblit_physics_soft
+      ref: main
+
   # The interface layer, from the scripting runtime's repository: a
   # description styled with utility classes or CSS, built as real widgets.
   # The scripting runtime itself — QuickJS, built as a native asset. The

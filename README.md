@@ -51,7 +51,9 @@ screenshot or a demo that should start where it means to.
 The engine, networking and examples are separate repositories, so each example
 declares what it needs by git reference. `tool/link_local.sh` swaps those for
 sibling checkouts while you work. The overrides it writes are not committed, so
-nothing ships wired to a path on one machine.
+nothing ships wired to a path on one machine. The gallery needs the scripting
+and physics checkouts as well: `./tool/link_local.sh ../orblit ../orblit-net
+../orblit-script ../orblit-physics`.
 
 ## Licence
 
