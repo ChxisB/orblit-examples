@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:orblit_filament/orblit_filament.dart';
 import 'package:orblit_gallery/main.dart' show galleryExamples;
@@ -14,6 +15,15 @@ import 'package:vector_math/vector_math_64.dart' hide Colors;
 /// is doing something silly. Neither shows up in a screenshot of a different
 /// example.
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  // The world interface example hands its pictures to the renderer in the
+  // background. No renderer runs here, so the channel answers and ignores.
+  TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+      .setMockMethodCallHandler(
+        const MethodChannel('orblit_filament/resources'),
+        (call) async => null,
+      );
+
   final camera = OrblitCamera(
     position: Vector3(0, 4, 14),
     target: Vector3.zero(),
