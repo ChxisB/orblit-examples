@@ -18,6 +18,8 @@ public sealed class OverlayTests
 {
     private const string Rate = " a second if nothing waited for the display";
 
+    private const double Step = 1 / 60.0;
+
     [Fact]
     public Task TheFramingNamesTheLiveShotAndTheFrameGivesItsShape() => Headless.Run(() =>
     {
@@ -205,6 +207,191 @@ public sealed class OverlayTests
         window.Close();
     });
 
+    /// <summary>
+    /// One run is played through the overlay, and its twin by the calls each key should make. Any
+    /// difference between the two is the overlay's.
+    /// </summary>
+    [Fact]
+    public Task TheRunnerIsPlayedFromTheKeyboard() => Headless.Run(() =>
+    {
+        var (played, twin) = (Runner(), Runner());
+        var overlay = new RunnerOverlay(played);
+        var window = Shown(overlay, 400, 300);
+        Assert.True(overlay.IsFocused);
+        Assert.Contains("Tap or press Space to run", Lines(overlay));
+        var together = Together(played, twin);
+
+        Press(window, PhysicalKey.Space);
+        twin.Confirm();
+        Assert.Equal(RunnerPhase.Running, played.Phase);
+        together();
+
+        Press(window, PhysicalKey.ArrowLeft);
+        twin.Steer(-1);
+        together();
+        Press(window, PhysicalKey.ArrowUp);
+        twin.Jump();
+        together();
+        // Held, it repeats, and is still one lane over.
+        window.KeyPressQwerty(PhysicalKey.D, RawInputModifiers.None);
+        window.KeyPressQwerty(PhysicalKey.D, RawInputModifiers.None);
+        window.KeyReleaseQwerty(PhysicalKey.D, RawInputModifiers.None);
+        twin.Steer(1);
+        together();
+        Press(window, PhysicalKey.ArrowDown);
+        twin.Slide();
+        together();
+        Press(window, PhysicalKey.A);
+        twin.Steer(-1);
+        together();
+        Press(window, PhysicalKey.S);
+        twin.Slide();
+        together();
+        Press(window, PhysicalKey.W);
+        twin.Jump();
+        together();
+        Assert.Equal(RunnerPhase.Running, played.Phase);
+
+        Press(window, PhysicalKey.Escape);
+        Assert.Equal(RunnerPhase.Paused, played.Phase);
+        Press(window, PhysicalKey.Enter);
+        Assert.Equal(RunnerPhase.Running, played.Phase);
+        Press(window, PhysicalKey.P);
+        Assert.Equal(RunnerPhase.Paused, played.Phase);
+        Press(window, PhysicalKey.P);
+        Assert.Equal(RunnerPhase.Running, played.Phase);
+        Press(window, PhysicalKey.Escape);
+        Press(window, PhysicalKey.NumPadEnter);
+        Assert.Equal(RunnerPhase.Running, played.Phase);
+        window.Close();
+    });
+
+    [Fact]
+    public Task ARunnerSwipeSteersJumpsOrSlidesAndATapMeansGo() => Headless.Run(() =>
+    {
+        var (played, twin) = (Runner(), Runner());
+        var overlay = new RunnerOverlay(played);
+        var window = Shown(overlay, 400, 300);
+        var together = Together(played, twin);
+        var middle = new Point(200, 150);
+
+        window.MouseDown(middle, MouseButton.Left);
+        window.MouseUp(middle, MouseButton.Left);
+        twin.Confirm();
+        Assert.Equal(RunnerPhase.Running, played.Phase);
+
+        foreach (var (by, move) in new (Vector By, Action Move)[]
+        {
+            (new(-40, 5), () => twin.Steer(-1)),
+            (new(3, -40), twin.Jump),
+            (new(40, -5), () => twin.Steer(1)),
+            (new(-3, 40), twin.Slide),
+        })
+        {
+            // Once however far it goes.
+            window.MouseDown(middle, MouseButton.Left);
+            window.MouseMove(middle + by);
+            window.MouseMove(middle + (by * 3));
+            window.MouseUp(middle + (by * 3), MouseButton.Left);
+            move();
+            together();
+        }
+
+        window.Close();
+    });
+
+    [Fact]
+    public Task TheRunnerPausesWhenFocusGoesElsewhereUnlessTheAutopilotPlays() => Headless.Run(() =>
+    {
+        var runner = Runner();
+        var overlay = new RunnerOverlay(runner);
+        var elsewhere = new Button { Content = "Elsewhere" };
+        var window = Shown(new DockPanel { Children = { elsewhere, overlay } }, 400, 300);
+        Press(window, PhysicalKey.Space);
+        window.KeyPressQwerty(PhysicalKey.ArrowLeft, RawInputModifiers.None);
+
+        elsewhere.Focus();
+        Assert.Equal(RunnerPhase.Paused, runner.Phase);
+
+        // The arrow let go of over there is not held here, so pressing it again counts.
+        overlay.Focus();
+        window.KeyPressQwerty(PhysicalKey.ArrowLeft, RawInputModifiers.None);
+        Assert.Equal(RunnerPhase.Running, runner.Phase);
+
+        runner.Autopilot = true;
+        elsewhere.Focus();
+        Assert.Equal(RunnerPhase.Running, runner.Phase);
+        window.Close();
+    });
+
+    [Fact]
+    public Task TheRunnerShowsTheScoreWhileItRunsAndACardWhileItDoesNot() => Headless.Run(() =>
+    {
+        var runner = Runner();
+        var overlay = new RunnerOverlay(runner);
+        var window = Shown(overlay, 400, 300);
+        Assert.Equal(400 / 300.0, runner.Aspect);
+        Assert.DoesNotContain("0", Lines(overlay));
+        Assert.DoesNotContain("Best 0", Lines(overlay));
+
+        runner.Start();
+        runner.Update(Step);
+        overlay.Refresh(Step);
+        Assert.Equal(["0", "0", "14 m/s"], Lines(overlay));
+
+        runner.Pause();
+        overlay.Refresh(Step);
+        Assert.Equal(["0", "0", "14 m/s", "Paused", "Tap, or press Esc or Space, to carry on"], Lines(overlay));
+
+        runner.Resume();
+        runner.Autopilot = true;
+        // More than one coin, so the label says what they were worth together.
+        while (runner.Popup() is not { Points: > 1 })
+        {
+            runner.Update(Step);
+        }
+
+        overlay.Refresh(Step);
+        Assert.Contains("AUTO", Lines(overlay));
+        var (points, at, _) = runner.Popup()!; // the loop above ends on one
+        var popup = Headless.Shown<TextBlock>(overlay).Single(text => text.Text == "+" + points);
+        // Centred on the point, a 120 by 40 label.
+        Assert.Equal((at.X + 1) / 2 * 400, popup.Margin.Left + 60, 6);
+        Assert.Equal((1 - at.Y) / 2 * 300, popup.Margin.Top + 20, 6);
+
+        runner.Autopilot = false;
+        while (runner.Phase == RunnerPhase.Running)
+        {
+            runner.Update(Step);
+        }
+
+        overlay.Refresh(Step);
+        int Flashes() => Headless.Shown<Border>(overlay).Count(border => border.Background is ISolidColorBrush { Color: var colour } && colour == Color.FromUInt32(0xFFE0302A));
+        Assert.Equal(1, Flashes());
+        Assert.DoesNotContain("Crashed!", Lines(overlay));
+        for (var i = 0; i < 45; i++)
+        {
+            runner.Update(Step);
+        }
+
+        overlay.Refresh(Step);
+        Assert.Equal(0, Flashes());
+        Assert.Contains("Crashed!", Lines(overlay));
+        Assert.Contains("A new best", Lines(overlay));
+
+        // A stumble, with crashing turned off so that it is not the end.
+        runner.Invincible = true;
+        runner.Confirm();
+        while (!runner.Careful)
+        {
+            runner.Update(Step);
+        }
+
+        overlay.Refresh(Step);
+        Assert.Contains("Careful!", Lines(overlay));
+        window.Close();
+    });
+
     private static string Load => "50000 members · 200 objects · sky fair";
 
     internal static T Control<T>(Example example, string label)
@@ -228,6 +415,36 @@ public sealed class OverlayTests
         {
             example.Scene(example.ViewPoint.ToRenderCamera(), frame / 60.0);
         }
+    }
+
+    // A renderer that takes the models and keeps nothing, so the runner's body is in the scene.
+    private static RunnerExample Runner() => new((_, _) => { }, _ => null);
+
+    private static void Press(Window window, PhysicalKey key)
+    {
+        window.KeyPressQwerty(key, RawInputModifiers.None);
+        window.KeyReleaseQwerty(key, RawInputModifiers.None);
+    }
+
+    /// <summary>Plays both a third of a second, and they must match at every frame.</summary>
+    private static Action Together(RunnerExample played, RunnerExample twin)
+    {
+        var seconds = 0.0;
+        return () =>
+        {
+            for (var frame = 0; frame < 20; frame++)
+            {
+                seconds += Step;
+                Assert.Equal(Body(twin, seconds), Body(played, seconds));
+            }
+        };
+    }
+
+    /// <summary>Where the runner's body is and how it stands, as its transform's sixteen numbers.</summary>
+    private static List<double> Body(RunnerExample runner, double seconds)
+    {
+        var body = runner.Scene(runner.ViewPoint.ToRenderCamera(), seconds).Objects.First(one => one.Key == 1).Transform;
+        return [.. Enumerable.Range(0, 16).Select(k => body[k])];
     }
 
     private static VoxelExample Walker()

@@ -15,7 +15,7 @@ public static class GalleryExamples
     /// </summary>
     public static IReadOnlyList<Example> All(IPictureFolder pictures, Func<string, string?> environment) =>
     [
-        .. EngineExamples.All(pictures, environment),
+        .. EngineExamples.All(pictures, environment, (name, bytes) => RenderResources.Provide(name, bytes)),
         new ClothExample((name, bytes) => RenderResources.Provide(name, bytes)),
         new NativeInterfaceExample(),
     ];
