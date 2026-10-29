@@ -16,7 +16,7 @@
   <ItemGroup>
     <PackageVersion Include="Orblit.Codegen" Version="0.1.0" />
     <PackageVersion Include="Orblit.Core" Version="0.1.0" />
-    <PackageVersion Include="Orblit.Examples" Version="0.2.0" />
+    <PackageVersion Include="Orblit.Examples" Version="0.3.0" />
     <PackageVersion Include="Orblit.Filament.Avalonia" Version="0.1.0" />
     <PackageVersion Include="Orblit.Net" Version="0.10.0" />
     <PackageVersion Include="Orblit.Physics.Soft" Version="0.2.0" />
