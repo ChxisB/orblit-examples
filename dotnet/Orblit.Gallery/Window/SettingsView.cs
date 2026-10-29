@@ -6,6 +6,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Platform.Storage;
 using Orblit.Examples;
 
 namespace Orblit.Gallery;
@@ -187,7 +188,42 @@ internal sealed class SettingsView : StackPanel
             Spacing = 4,
             Children = { Label(first.Label, GalleryColours.Body), box },
         };
-        return new Row(view, first, newer => entry = (TextEntry)newer);
+        if (first.Pick is null)
+        {
+            return new Row(view, first, newer => entry = (TextEntry)newer);
+        }
+
+        var pick = new Button { Content = first.Pick.Button, Padding = new Thickness(9, 4), CornerRadius = new CornerRadius(4), FontSize = 11.5, MinHeight = 0 };
+        pick.Click += async (_, _) =>
+        {
+            // Into the box, so a chosen file is taken exactly as a typed one is.
+            if (entry.Pick is { } wanted && await PickFile(wanted) is { } path)
+            {
+                box.Text = path;
+            }
+        };
+        view.Children.Insert(1, pick);
+        return new Row(view, first, newer =>
+        {
+            entry = (TextEntry)newer;
+            pick.Content = entry.Pick?.Button;
+        });
+    }
+
+    /// <summary>The local path of the one file chosen, or null for none, or for one with no path on this disk.</summary>
+    private async Task<string?> PickFile(FilePick pick)
+    {
+        if (TopLevel.GetTopLevel(this) is not { } top)
+        {
+            return null;
+        }
+
+        var chosen = await top.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+        {
+            AllowMultiple = false,
+            FileTypeFilter = [new FilePickerFileType(string.Join(", ", pick.Extensions)) { Patterns = [.. pick.Extensions.Select(extension => "*." + extension)] }],
+        });
+        return chosen.Count > 0 ? chosen[0].TryGetLocalPath() : null;
     }
 
     private static Row CaptionRow(Caption first)
