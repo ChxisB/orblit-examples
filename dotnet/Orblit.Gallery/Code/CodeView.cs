@@ -62,7 +62,8 @@ internal sealed class CodeView : Border
     private string _source = "";
     private IReadOnlyList<CodeLine> _lines = [];
     private IReadOnlyList<CodeLine> _rows = [];
-    private double _fittedTo = -1;
+    // What the code was last laid out for. Room is 0 until it has been.
+    private (double Room, int FirstRows, bool Whole) _laid;
     private bool _folded;
     private bool _whole;
     private IDisposable? _copiedFor;
@@ -130,7 +131,7 @@ internal sealed class CodeView : Border
         _count.Text = $"{_lines.Count} lines";
         // Asked of one example, so it goes back to the first rows for the next.
         _whole = false;
-        _fittedTo = -1;
+        _laid = default;
         Lay();
     }
 
@@ -169,13 +170,20 @@ internal sealed class CodeView : Border
             return;
         }
 
-        if (room != _fittedTo)
+        // A resize that changes none of these leaves the text alone, and what is selected in it.
+        var laid = (Room: room, FirstRows: FirstRows(), Whole: _whole);
+        if (laid == _laid)
         {
-            _rows = FitTo(room);
-            _fittedTo = room;
+            return;
         }
 
-        Cut(_close is null && _rows.Count > FirstRows() + 6);
+        if (room != _laid.Room)
+        {
+            _rows = FitTo(room);
+        }
+
+        _laid = laid;
+        Cut(_close is null && _rows.Count > laid.FirstRows + 6);
     }
 
     /// <summary>

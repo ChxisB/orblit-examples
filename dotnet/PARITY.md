@@ -6,7 +6,8 @@ is built.
 Dart declared counts the test declarations in the file. Dart run counts the
 tests that execute, because a loop runs one declaration many times. C# ported
 counts the C# tests that carry a Dart test over. Added in C# counts tests with
-no Dart twin. A file is done when C# ported equals Dart run.
+no Dart twin. A file is done when C# ported equals Dart run, less the tests a
+decision drops.
 
 The rules are the engine's `dotnet/PORTING.md`, in the `orblit` repository. The
 engine packages come from a folder. The engine's `tool/pack_local.sh` packs

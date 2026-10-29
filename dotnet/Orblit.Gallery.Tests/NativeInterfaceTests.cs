@@ -66,6 +66,7 @@ public sealed class NativeInterfaceTests
         var example = new NativeInterfaceExample();
         var window = Shown(example);
         var bar = Named<Border>(window, "power_bar");
+        var colour = bar.Background;
 
         example.Health = 0.3;
         Overlay(window).Refresh(2);
@@ -73,6 +74,8 @@ public sealed class NativeInterfaceTests
 
         Assert.Same(bar, Named<Border>(window, "power_bar"));
         Gallery.Text(window, "30%");
+        // The accent did not change, so neither did its brush.
+        Assert.Same(colour, bar.Background);
         window.Close();
     });
 

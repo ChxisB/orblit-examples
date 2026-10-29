@@ -1,3 +1,6 @@
+using Avalonia.Automation;
+using Avalonia.Automation.Peers;
+using Avalonia.VisualTree;
 using Orblit.Examples;
 
 namespace Orblit.Gallery.Tests;
@@ -34,13 +37,19 @@ public sealed class SidebarTests
         // push the others below the window.
         var first = Gallery.Examples().First(one => one.Section == ExampleSection.Showcases).Name;
 
-        Headless.Click(window, Gallery.Text(window, "SHOWCASES"));
+        var heading = Gallery.Text(window, "SHOWCASES");
+        var told = new List<object?>();
+        ControlAutomationPeer.CreatePeerForElement(Assert.IsType<FoldButton>(heading.FindAncestorOfType<FoldButton>())).PropertyChanged += (_, e) => told.Add(e.NewValue);
+
+        Headless.Click(window, heading);
         Gallery.Text(window, first);
         // Opening one leaves the others as they were.
         Gallery.Text(window, "Virtual cameras");
 
-        Headless.Click(window, Gallery.Text(window, "SHOWCASES"));
+        Headless.Click(window, heading);
         Assert.Empty(Gallery.Texts(window, first));
+        // A screen reader hears each change as it happens.
+        Assert.Equal([ExpandCollapseState.Expanded, ExpandCollapseState.Collapsed], told);
         window.Close();
     });
 }

@@ -84,18 +84,30 @@ public sealed class NativeInterfaceExample : Example
     ];
 
     public override string Code => """
-        // Plain Avalonia controls, built once.
-        var percent = new TextBlock { FontSize = 11, Foreground = Slate300 };
-        // A bar is two boxes: the track, and as much of it as is left.
-        var fill = new Border { Height = 8, CornerRadius = new CornerRadius(4), HorizontalAlignment = HorizontalAlignment.Left };
-        var track = new Border { Height = 8, CornerRadius = new CornerRadius(4), Background = Slate700, ClipToBounds = true, Child = fill };
+        // Plain Avalonia controls, built once. The bar sits in a track, a
+        // second Border with ClipToBounds, so a full bar keeps its round ends.
+        private readonly TextBlock _power = new() { FontSize = 11, Foreground = Soft };
+        private readonly Border _bar = new() { Height = 8, CornerRadius = new CornerRadius(4), HorizontalAlignment = HorizontalAlignment.Left };
+        private readonly Border[] _pips = [.. Enumerable.Range(0, 5).Select(i => new Border { Width = 24, Height = 4 })];
 
         // Then changed in place each frame, from the settings.
-        void Refresh()
+        public void Refresh(double seconds)
         {
-            percent.Text = $"{Math.Round(Health * 100, MidpointRounding.AwayFromZero)}%";
-            fill.Width = Math.Round(Health * 224, MidpointRounding.AwayFromZero);
-            fill.Background = BarColourOf(Accent);
+            // Brushes are made when the accent changes, not every frame.
+            var colours = _example.AccentColours;
+            if (colours != _colours)
+            {
+                _colours = colours;
+                _bar.Background = GalleryColours.Of(colours.Bar);
+                _lit = GalleryColours.Of(colours.Pip);
+            }
+
+            _bar.Width = _example.BarWidth;
+            _power.Text = _example.PowerLabel;
+            for (var i = 0; i < _pips.Length; i++)
+            {
+                _pips[i].Background = i < _example.Shields ? _lit : Groove;
+            }
         }
         """;
 

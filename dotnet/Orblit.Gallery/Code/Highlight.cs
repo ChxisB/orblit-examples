@@ -5,25 +5,26 @@ namespace Orblit.Gallery;
 /// <summary>Colours the words of a snippet, so it can be drawn as code.</summary>
 public static partial class Highlight
 {
-    private static readonly Words CSharp = new(
-        Control:
-        [
-            "await", "break", "case", "catch", "continue", "default", "do", "else", "finally", "for", "foreach", "goto",
-            "if", "in", "lock", "return", "switch", "throw", "try", "using", "when", "while", "yield",
-        ],
-        Keywords:
-        [
-            "abstract", "and", "as", "async", "base", "class", "const", "delegate", "enum", "event", "explicit", "extern",
-            "false", "fixed", "get", "implicit", "init", "interface", "internal", "is", "namespace", "nameof", "new",
-            "not", "null", "operator", "or", "out", "override", "params", "partial", "private", "protected", "public",
-            "readonly", "record", "ref", "required", "sealed", "set", "sizeof", "static", "struct", "this", "true",
-            "typeof", "var", "virtual", "void", "volatile", "with",
-        ],
-        Types:
-        [
-            "bool", "byte", "char", "decimal", "double", "dynamic", "float", "int", "long", "nint", "nuint", "object",
-            "sbyte", "short", "string", "uint", "ulong", "ushort",
-        ]);
+    private static readonly HashSet<string> Control =
+    [
+        "await", "break", "case", "catch", "continue", "default", "do", "else", "finally", "for", "foreach", "goto",
+        "if", "in", "lock", "return", "switch", "throw", "try", "using", "when", "while", "yield",
+    ];
+
+    private static readonly HashSet<string> Keywords =
+    [
+        "abstract", "and", "as", "async", "base", "class", "const", "delegate", "enum", "event", "explicit", "extern",
+        "false", "fixed", "get", "implicit", "init", "interface", "internal", "is", "namespace", "nameof", "new",
+        "not", "null", "operator", "or", "out", "override", "params", "partial", "private", "protected", "public",
+        "readonly", "record", "ref", "required", "sealed", "set", "sizeof", "static", "struct", "this", "true",
+        "typeof", "var", "virtual", "void", "volatile", "with",
+    ];
+
+    private static readonly HashSet<string> Types =
+    [
+        "bool", "byte", "char", "decimal", "double", "dynamic", "float", "int", "long", "nint", "nuint", "object",
+        "sbyte", "short", "string", "uint", "ulong", "ushort",
+    ];
 
     /// <summary><paramref name="source"/> as lines, with every character given a <see cref="Tone"/>.</summary>
     /// <remarks>
@@ -64,8 +65,6 @@ public static partial class Highlight
     // A suffix, as in 0.5f, is part of the number.
     [GeneratedRegex(@"\G(?:0[xX][0-9a-fA-F_]+|\d[\d_]*(?:\.\d[\d_]*)?(?:[eE][+-]?\d+)?)[fFdDmMuUlL]*")]
     private static partial Regex NumberShape();
-
-    private sealed record Words(HashSet<string> Control, HashSet<string> Keywords, HashSet<string> Types);
 
     private sealed class Scanner
     {
@@ -153,7 +152,8 @@ public static partial class Highlight
                 return false;
             }
 
-            var to = StartsAt(at, "\"\"\"") ? RawEnd(at) : StringEnd(at);
+            var verbatim = _s.AsSpan(_i, at - _i).Contains('@');
+            var to = StartsAt(at, "\"\"\"") ? RawEnd(at) : verbatim ? VerbatimEnd(at) : StringEnd(at);
             Paint(_i, to, Tone.String);
             _last = _s[at];
             _i = to;
@@ -182,6 +182,31 @@ public static partial class Highlight
                 {
                     return at;
                 }
+            }
+
+            return _s.Length;
+        }
+
+        /// <summary>Just past the closing quote of the verbatim string at <paramref name="start"/>.</summary>
+        /// <remarks>
+        /// A backslash is only a backslash here, and two quotes are one quote
+        /// in the string. Like a raw string, it may run on past its line.
+        /// </remarks>
+        private int VerbatimEnd(int start)
+        {
+            for (var at = start + 1; at < _s.Length; at++)
+            {
+                if (_s[at] != '"')
+                {
+                    continue;
+                }
+
+                if (!Is(at + 1, '"'))
+                {
+                    return at + 1;
+                }
+
+                at++;
             }
 
             return _s.Length;
@@ -244,27 +269,27 @@ public static partial class Highlight
                 return Is(next, '(') ? Tone.Call : Tone.Name;
             }
 
-            if (CSharp.Control.Contains(word))
+            if (Control.Contains(word))
             {
                 return Tone.Control;
             }
 
-            if (CSharp.Keywords.Contains(word))
+            if (Keywords.Contains(word))
             {
                 return Tone.Keyword;
             }
 
-            if (CSharp.Types.Contains(word))
+            if (Types.Contains(word))
             {
                 return Tone.Type;
             }
 
-            return CSharpToneOf(word, next);
+            return GuessedToneOf(word, next);
         }
 
         // C# capitalises methods and properties as well as types. So a call
         // is told by its bracket, and a member being set by its equals sign.
-        private Tone CSharpToneOf(string word, int next)
+        private Tone GuessedToneOf(string word, int next)
         {
             if (_lastWord == "new")
             {

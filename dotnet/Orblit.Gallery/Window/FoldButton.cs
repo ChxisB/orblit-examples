@@ -27,14 +27,31 @@ internal sealed class FoldButton : Button
         Click += (_, _) => toggle();
     }
 
-    public bool IsOpen { get; set; }
+    private Peer? _peer;
+    private bool _open;
 
-    protected override AutomationPeer OnCreateAutomationPeer() => new Peer(this);
+    public bool IsOpen
+    {
+        get => _open;
+        set
+        {
+            if (value == _open)
+            {
+                return;
+            }
+
+            _open = value;
+            _peer?.RaisePropertyChangedEvent(ExpandCollapsePatternIdentifiers.ExpandCollapseStateProperty, StateOf(!value), StateOf(value));
+        }
+    }
+
+    protected override AutomationPeer OnCreateAutomationPeer() => _peer = new Peer(this);
+
+    private static ExpandCollapseState StateOf(bool open) => open ? ExpandCollapseState.Expanded : ExpandCollapseState.Collapsed;
 
     private sealed class Peer(FoldButton owner) : ButtonAutomationPeer(owner), IExpandCollapseProvider
     {
-        public ExpandCollapseState ExpandCollapseState =>
-            owner.IsOpen ? ExpandCollapseState.Expanded : ExpandCollapseState.Collapsed;
+        public ExpandCollapseState ExpandCollapseState => StateOf(owner.IsOpen);
 
         public bool ShowsMenu => false;
 

@@ -22,6 +22,8 @@ public sealed class CodeViewTests
             var light = new RenderLight(200) { Key = 1, CastShadows = true }.Normalize();
               // lux
             foreach (var x in xs) Print($"a // {x}", 0xFF0B1224, 0.53f);
+            var dir = @"C:\temp\"; Run(dir, @"say ""hi""
+              and bye");
             var style = """
                 panel { padding: 8 }
                 """;
@@ -46,6 +48,12 @@ public sealed class CodeViewTests
         Assert.Equal(Tone.String, ToneOf(lines, "$\"a // {x}\""));
         Assert.Equal(Tone.Number, ToneOf(lines, "0xFF0B1224"));
         Assert.Equal(Tone.Number, ToneOf(lines, "0.53f"));
+        // In a verbatim string a backslash does not hide the quote after it,
+        // two quotes are one, and a line break is part of the string.
+        Assert.Equal(Tone.String, ToneOf(lines, "@\"C:\\temp\\\""));
+        Assert.Equal(Tone.Call, ToneOf(lines, "Run"));
+        Assert.Equal(Tone.String, ToneOf(lines, "@\"say \"\"hi\"\""));
+        Assert.Equal(Tone.String, ToneOf(lines, "and bye\""));
         // A raw string runs to its closing quotes, past the end of its line.
         Assert.Equal(Tone.String, ToneOf(lines, "panel { padding: 8 }"));
     }
@@ -168,6 +176,12 @@ public sealed class CodeViewTests
         var colours = Code(window).Inlines!.OfType<Run>().Select(run => run.Foreground).Distinct();
         Assert.True(colours.Count() >= 5);
 
+        // The next example's code takes its place, in the same room.
+        var first = Gallery.Examples()[0];
+        var shown = Shown(window);
+        Headless.Click(window, Gallery.Text(window, Gallery.Examples().Where(one => one.Section == first.Section).ElementAt(1).Name));
+        Assert.NotEqual(shown, Shown(window));
+
         Headless.Click(window, Button(window, "Open wider"));
         Assert.Equal(2, Headless.Shown<CodeView>(window).Count());
 
@@ -183,6 +197,12 @@ public sealed class CodeViewTests
         var window = Gallery.Open(height: 700);
         var first = RowsShown(window);
         Assert.Equal((int)Math.Floor((700 - 320) / (11 * 1.55)), first);
+
+        // Taller, but not by a row, so the text stays, and so would what is selected in it.
+        var inlines = Code(window).Inlines;
+        window.Height = 705;
+        Headless.Render();
+        Assert.Same(inlines, Code(window).Inlines);
 
         Headless.Click(window, Assert.Single(Headless.Shown<TextBlock>(window), one => one.Text?.StartsWith("Show all", StringComparison.Ordinal) == true));
         Assert.True(RowsShown(window) > first);
@@ -220,6 +240,9 @@ public sealed class CodeViewTests
 
     private static Button Button(Window window, string name) =>
         Assert.Single(Headless.Shown<Button>(window), one => AutomationProperties.GetName(one) == name);
+
+    /// <summary>The text of the panel's code, as it is showing.</summary>
+    private static string Shown(Window window) => string.Concat(Code(window).Inlines!.OfType<Run>().Select(run => run.Text));
 
     /// <summary>How many rows the panel's code is showing.</summary>
     private static int RowsShown(Window window) => Code(window).Inlines!.OfType<LineBreak>().Count() + 1;

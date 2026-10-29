@@ -23,6 +23,10 @@ internal sealed class NativeInterfaceOverlay : StackPanel, IStageLayer
     private readonly Border _bar = new() { Name = "power_bar", Height = 8, CornerRadius = new CornerRadius(4), HorizontalAlignment = HorizontalAlignment.Left };
     private readonly Border[] _pips = [.. Enumerable.Range(0, 5).Select(i => new Border { Name = $"pip_{i}", Width = 24, Height = 4, CornerRadius = new CornerRadius(2) })];
 
+    // No accent is fully clear, so the first refresh always makes the brushes.
+    private (uint Bar, uint Pip) _colours;
+    private IBrush _lit = Groove;
+
     public NativeInterfaceOverlay(NativeInterfaceExample example)
     {
         _example = example;
@@ -39,14 +43,22 @@ internal sealed class NativeInterfaceOverlay : StackPanel, IStageLayer
 
     public void Refresh(double seconds)
     {
-        var (bar, pip) = _example.AccentColours;
-        _dot.Background = GalleryColours.Of(bar);
-        _bar.Background = GalleryColours.Of(bar);
+        // Brushes are made when the accent changes, not every frame.
+        var colours = _example.AccentColours;
+        if (colours != _colours)
+        {
+            _colours = colours;
+            var accent = GalleryColours.Of(colours.Bar);
+            _dot.Background = accent;
+            _bar.Background = accent;
+            _lit = GalleryColours.Of(colours.Pip);
+        }
+
         _bar.Width = _example.BarWidth;
         _power.Text = _example.PowerLabel;
         for (var i = 0; i < _pips.Length; i++)
         {
-            _pips[i].Background = i < _example.Shields ? GalleryColours.Of(pip) : Groove;
+            _pips[i].Background = i < _example.Shields ? _lit : Groove;
         }
     }
 
