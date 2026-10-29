@@ -20,21 +20,28 @@ public sealed class StageTests
     public void TheRendererSaysWhatAModelHoldsAndTheFirstThingThatWentWrong()
     {
         var example = new CamerasExample();
+        string? heard = null;
 
-        StageView.Hear(example, [new($"{AssetInfo.NotePrefix}/fox.glb", Fox), new("/a.glb", "No file at /a.glb"), new("/b.glb", "No file at /b.glb")]);
+        StageView.Hear(example, [new($"{AssetInfo.NotePrefix}/fox.glb", Fox), new("/a.glb", "No file at /a.glb"), new("/b.glb", "No file at /b.glb")], ref heard);
 
         var fox = Assert.Single(example.Models);
         Assert.Equal(("/fox.glb", "Survey"), (fox.Key, Assert.Single(fox.Value.Clips).Name));
         Assert.Equal("No file at /a.glb", example.Note);
 
-        // A later report replaces what a model holds, and leaves a note standing until the example clears it.
-        StageView.Hear(example, [new($"{AssetInfo.NotePrefix}/fox.glb", Fox.Replace("Survey", "Walk", StringComparison.Ordinal)), new("/c.glb", "Later")]);
+        // A later report replaces what a model holds, and leaves a note standing while the renderer still says it.
+        StageView.Hear(example, [new($"{AssetInfo.NotePrefix}/fox.glb", Fox.Replace("Survey", "Walk", StringComparison.Ordinal)), new("/c.glb", "Later"), new("/a.glb", "No file at /a.glb")], ref heard);
         Assert.Equal("Walk", Assert.Single(Assert.Single(example.Models).Value.Clips).Name);
         Assert.Equal("No file at /a.glb", example.Note);
 
-        example.Note = null;
-        StageView.Hear(example, [new($"{AssetInfo.NotePrefix}/fox.glb", Fox)]);
+        // Said while a model converts, and dropped once it is drawn.
+        StageView.Hear(example, [new($"{AssetInfo.NotePrefix}/fox.glb", Fox)], ref heard);
         Assert.Null(example.Note);
+
+        // A note the example set itself stays until the example clears it.
+        example.Note = "Mine";
+        StageView.Hear(example, [new("/c.glb", "Later")], ref heard);
+        StageView.Hear(example, [], ref heard);
+        Assert.Equal("Mine", example.Note);
     }
 
     [Fact]

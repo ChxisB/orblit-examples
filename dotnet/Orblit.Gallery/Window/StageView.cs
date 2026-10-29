@@ -19,6 +19,7 @@ internal sealed class StageView : Border
     private readonly Panel _layers = new();
     private readonly double _orbit;
     private Example _showing;
+    private string? _heard;
     private double _facing;
     private Point? _dragging;
 
@@ -60,6 +61,7 @@ internal sealed class StageView : Border
     public void Show(Example example)
     {
         _showing = example;
+        _heard = null;
         View = example.ViewPoint;
         _facing = View.Yaw;
         if (_renderer is not null)
@@ -81,7 +83,7 @@ internal sealed class StageView : Border
         if (_renderer is { } viewport && viewport.Frame(_showing.Scene(View.ToRenderCamera(), seconds), seconds) && viewport.Renderer is { } drawn)
         {
             _showing.Device ??= drawn.GetProfile();
-            Hear(_showing, drawn.GetNotes());
+            Hear(_showing, drawn.GetNotes(), ref _heard);
         }
 
         foreach (var layer in _layers.Children.OfType<IStageLayer>())
@@ -91,10 +93,11 @@ internal sealed class StageView : Border
     }
 
     /// <summary>
-    /// Gives <paramref name="example"/> what the renderer said of the scene it drew. A note stays until
-    /// the example clears it, so one the example set itself is not written over.
+    /// Gives <paramref name="example"/> what the renderer said of the scene it drew. A note the example
+    /// set itself stays until the example clears it. The renderer's own, kept in <paramref name="heard"/>,
+    /// goes when the renderer stops saying it, as when a model it was converting is drawn.
     /// </summary>
-    internal static void Hear(Example example, IReadOnlyList<Note> notes)
+    internal static void Hear(Example example, IReadOnlyList<Note> notes, ref string? heard)
     {
         var said = new Dictionary<string, string>();
         foreach (var note in notes)
@@ -108,9 +111,14 @@ internal sealed class StageView : Border
             example.Models[model.Path] = model;
         }
 
-        if (problems.Count > 0)
+        if (example.Note is { } shown && shown == heard && !problems.Values.Contains(shown))
         {
-            example.Note ??= problems.Values.First();
+            example.Note = null;
+        }
+
+        if (problems.Count > 0 && example.Note is null)
+        {
+            example.Note = heard = problems.Values.First();
         }
     }
 
