@@ -18,3 +18,8 @@ pubspec_overrides.yaml
 # not to run the examples — what they load is checked in.
 node_modules/
 gallery/script/build/
+
+# .NET build output
+dotnet/**/bin/
+dotnet/**/obj/
+dotnet/**/TestResults/
