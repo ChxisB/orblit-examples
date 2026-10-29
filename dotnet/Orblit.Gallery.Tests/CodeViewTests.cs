@@ -1,3 +1,6 @@
+using Avalonia.Automation;
+using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Orblit.Examples;
 
 namespace Orblit.Gallery.Tests;
@@ -5,7 +8,8 @@ namespace Orblit.Gallery.Tests;
 /// <summary>
 /// The code panel's text: coloured by what each word is, and broken to fit
 /// the panel where somebody would have broken it, rather than wherever the
-/// text engine runs out of room.
+/// text engine runs out of room. Then the panel itself, which folds, opens
+/// long code at its first rows and opens wider.
 /// </summary>
 public sealed class CodeViewTests
 {
@@ -188,6 +192,72 @@ public sealed class CodeViewTests
 
         Assert.Equal(Texts(lines), Texts(Fit.To(lines, 60)));
     }
+
+    [Fact]
+    public Task ThePanelShowsTheCodeColouredAndOpensItWider() => Headless.Run(() =>
+    {
+        var window = Gallery.Open();
+
+        Assert.Single(Headless.Shown<CodeView>(window));
+        Gallery.Text(window, "C#");
+        var colours = Code(window).Inlines!.OfType<Run>().Select(run => run.Foreground).Distinct();
+        Assert.True(colours.Count() >= 5);
+
+        Headless.Click(window, Button(window, "Open wider"));
+        Assert.Equal(2, Headless.Shown<CodeView>(window).Count());
+
+        Headless.Click(window, Button(window, "Close"));
+        Assert.Single(Headless.Shown<CodeView>(window));
+        window.Close();
+    });
+
+    [Fact]
+    public Task LongCodeOpensAtItsFirstRowsAndShowsAllWhenAsked() => Headless.Run(() =>
+    {
+        // A short window, so there is more code than room for it.
+        var window = Gallery.Open(height: 700);
+        var first = RowsShown(window);
+        Assert.Equal((int)Math.Floor((700 - 320) / (11 * 1.55)), first);
+
+        Headless.Click(window, Assert.Single(Headless.Shown<TextBlock>(window), one => one.Text?.StartsWith("Show all", StringComparison.Ordinal) == true));
+        Assert.True(RowsShown(window) > first);
+
+        var less = Gallery.Text(window, "Show less");
+        less.BringIntoView();
+        Headless.Render();
+        Headless.Click(window, less);
+        Assert.Equal(first, RowsShown(window));
+        window.Close();
+    });
+
+    [Fact]
+    public Task TheBarFoldsTheCodeAwayAndItStaysFolded() => Headless.Run(() =>
+    {
+        var window = Gallery.Open();
+        Code(window);
+
+        Headless.Click(window, Gallery.Text(window, "C#"));
+        Assert.Empty(Headless.Shown<SelectableTextBlock>(window));
+        // The bar is still there, to say what is folded and to open it again.
+        Assert.Single(Headless.Shown<TextBlock>(window), one => one.Text?.EndsWith(" lines", StringComparison.Ordinal) == true);
+
+        // Folded for the next example too: somebody who folded it is looking
+        // at scenes, not code.
+        Headless.Click(window, Gallery.Text(window, "Virtual cameras"));
+        Assert.Empty(Headless.Shown<SelectableTextBlock>(window));
+
+        Headless.Click(window, Gallery.Text(window, "C#"));
+        Code(window);
+        window.Close();
+    });
+
+    private static SelectableTextBlock Code(Window window) => Assert.Single(Headless.Shown<SelectableTextBlock>(window));
+
+    private static Button Button(Window window, string name) =>
+        Assert.Single(Headless.Shown<Button>(window), one => AutomationProperties.GetName(one) == name);
+
+    /// <summary>How many rows the panel's code is showing.</summary>
+    private static int RowsShown(Window window) => Code(window).Inlines!.OfType<LineBreak>().Count() + 1;
 
     /// <summary>The one tone of the first place <paramref name="text"/> appears.</summary>
     private static Tone ToneOf(IReadOnlyList<CodeLine> lines, string text)

@@ -1,0 +1,113 @@
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Layout;
+using Avalonia.Media;
+using Orblit.Examples;
+using Orblit.Filament.Avalonia;
+
+namespace Orblit.Gallery;
+
+/// <summary>
+/// The scene of the example on show, which a drag turns and a scroll moves in and out. Off the
+/// renderer, it says why there is no scene.
+/// </summary>
+internal sealed class StageView : Border
+{
+    private readonly RendererViewport? _renderer;
+    private readonly double _orbit;
+    private Example _showing;
+    private double _facing;
+    private Point? _dragging;
+
+    /// <param name="showing">The example to show first.</param>
+    /// <param name="renderer">Whether to draw with the renderer, which runs on macOS so far.</param>
+    /// <param name="orbit">How fast the camera circles on its own, in radians a second.</param>
+    public StageView(Example showing, bool renderer, double orbit)
+    {
+        _showing = showing;
+        _orbit = orbit;
+        View = showing.ViewPoint;
+        _facing = View.Yaw;
+        // Without a background a drag on the stage would fall through it.
+        Background = Brushes.Transparent;
+        if (renderer)
+        {
+            _renderer = new RendererViewport();
+            Child = _renderer;
+        }
+        else
+        {
+            Background = GalleryColours.Of(0xFF161B22);
+            Child = new TextBlock
+            {
+                Text = "The renderer runs on macOS so far.",
+                Foreground = GalleryColours.Blurb,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+        }
+    }
+
+    /// <summary>Where the camera looks from now.</summary>
+    public ViewPoint View { get; private set; }
+
+    /// <summary>Shows <paramref name="example"/> from where it says to look at it.</summary>
+    public void Show(Example example)
+    {
+        _showing = example;
+        View = example.ViewPoint;
+        _facing = View.Yaw;
+    }
+
+    /// <summary>Draws the example as it is <paramref name="seconds"/> after it was shown.</summary>
+    public void Draw(double seconds)
+    {
+        // From the clock rather than added up each frame, so that a clip meant to be exactly one turn
+        // is one turn whatever the frame rate did.
+        if (_orbit != 0)
+        {
+            View = View with { Yaw = _facing + (_orbit * seconds) };
+        }
+
+        _renderer?.Frame(_showing.Scene(View.ToRenderCamera(), seconds), seconds);
+    }
+
+    protected override void OnPointerPressed(PointerPressedEventArgs e)
+    {
+        base.OnPointerPressed(e);
+        _dragging = e.GetPosition(this);
+        e.Pointer.Capture(this);
+    }
+
+    protected override void OnPointerMoved(PointerEventArgs e)
+    {
+        base.OnPointerMoved(e);
+        if (_dragging is { } from)
+        {
+            var at = e.GetPosition(this);
+            View = ViewMoves.Orbited(View, at - from);
+            _dragging = at;
+        }
+    }
+
+    protected override void OnPointerReleased(PointerReleasedEventArgs e)
+    {
+        base.OnPointerReleased(e);
+        _dragging = null;
+    }
+
+    protected override void OnPointerCaptureLost(PointerCaptureLostEventArgs e)
+    {
+        base.OnPointerCaptureLost(e);
+        _dragging = null;
+    }
+
+    protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
+    {
+        base.OnPointerWheelChanged(e);
+        // A wheel notch is a hundred of the pixels a trackpad scrolls by.
+        View = ViewMoves.Zoomed(View, -e.Delta.Y * 100);
+        e.Handled = true;
+    }
+}

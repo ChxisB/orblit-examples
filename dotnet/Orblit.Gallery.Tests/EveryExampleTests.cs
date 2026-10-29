@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using Avalonia;
+using Avalonia.Controls;
 using Orblit.Examples;
 using Orblit.Filament;
 using Orblit.VectorMath;
@@ -84,6 +86,34 @@ public sealed class EveryExampleTests
         Assert.NotEmpty(own);
         Assert.All(own, path => Assert.True(File.Exists(path) && new FileInfo(path).Length > 0, $"{path} was not written, or was written empty."));
     }
+
+    [Theory]
+    [MemberData(nameof(Names))]
+    public Task ShowsItsSettings(string name) => Headless.Run(() =>
+    {
+        // In the panel the gallery puts them in, a coloured box in a
+        // scrolling list, so a setting that only breaks there breaks here.
+        var example = Example(name);
+        var window = new Window
+        {
+            Width = 420,
+            Height = 900,
+            Content = new Border
+            {
+                Background = GalleryColours.Side,
+                Child = new ScrollViewer { Content = new SettingsView(example) { Margin = new Thickness(16) } },
+            },
+        };
+        window.Show();
+        Headless.Render();
+
+        foreach (var setting in example.Settings().Where(one => one.Label.Length > 0))
+        {
+            Assert.Contains(Headless.Shown<TextBlock>(window), one => one.Text == setting.Label);
+        }
+
+        window.Close();
+    });
 
     /// <summary>The gallery's own picture folder, with nothing set in the environment.</summary>
     private static IReadOnlyList<Example> All() => GalleryExamples.All(new TempPictureFolder(), _ => null);
