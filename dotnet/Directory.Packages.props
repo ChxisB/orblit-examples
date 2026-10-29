@@ -14,8 +14,11 @@
 
   <!-- The Orblit packages are the versions the engine had on 2026-10-29. -->
   <ItemGroup>
+    <PackageVersion Include="Orblit.Codegen" Version="0.1.0" />
+    <PackageVersion Include="Orblit.Core" Version="0.1.0" />
     <PackageVersion Include="Orblit.Examples" Version="0.2.0" />
     <PackageVersion Include="Orblit.Filament.Avalonia" Version="0.1.0" />
+    <PackageVersion Include="Orblit.Net" Version="0.10.0" />
     <PackageVersion Include="Orblit.Physics.Soft" Version="0.2.0" />
     <PackageVersion Include="Orblit.Stage" Version="0.5.0" />
   </ItemGroup>
