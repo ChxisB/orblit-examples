@@ -121,6 +121,7 @@ internal sealed class StageView : Border
         VoxelExample voxels => new WalkOverlay(voxels),
         BenchmarkExample benchmark => new Readout(benchmark, gpuMilliseconds),
         InterfaceExample face => new ScriptOverlay(face),
+        NativeInterfaceExample native => new NativeInterfaceOverlay(native),
         _ => null,
     };
 
