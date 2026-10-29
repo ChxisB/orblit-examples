@@ -25,8 +25,7 @@ public sealed class CodeViewTests
             var style = """
                 panel { padding: 8 }
                 """;
-            """",
-            CodeLanguage.CSharp);
+            """");
 
         Assert.Equal(Tone.Type, ToneOf(lines, "Fact"));
         Assert.Equal(Tone.Keyword, ToneOf(lines, "var"));
@@ -52,53 +51,13 @@ public sealed class CodeViewTests
     }
 
     [Fact]
-    public void TsxTellsATagFromALessThanAndTextFromCode()
-    {
-        var lines = Highlight.Lines(
-            """
-            for (let i = 0; i < many; i++) {}
-            return (
-              <button class="px-3" onPressed={() => { go(1); }}>
-                Repair
-              </button>
-            );
-            mount(() => <Hud />);
-            """,
-            CodeLanguage.Tsx);
-
-        // i < many
-        Assert.Equal(Tone.Plain, ToneOf(lines, "<"));
-        Assert.Equal(Tone.Name, ToneOf(lines, "many"));
-        Assert.Equal(Tone.Tag, ToneOf(lines, "button"));
-        // An attribute, not `class`.
-        Assert.Equal(Tone.Name, ToneOf(lines, "class"));
-        Assert.Equal(Tone.String, ToneOf(lines, "\"px-3\""));
-        Assert.Equal(Tone.Call, ToneOf(lines, "go"));
-        // What sits between the tags is text, whatever case it is in...
-        Assert.Equal(Tone.Plain, ToneOf(lines, "Repair"));
-        // ...and once the last tag is closed, what follows is code again.
-        Assert.Equal(Tone.Call, ToneOf(lines, "mount"));
-        Assert.Equal(Tone.Type, ToneOf(lines, "Hud"));
-    }
-
-    [Fact]
-    public void OnlyTheTwoScriptExamplesAreReadAsTsx()
-    {
-        var tsx = GalleryExamples.All(new TempPictureFolder(), _ => null)
-            .Where(example => Highlight.LanguageOf(example.Code) == CodeLanguage.Tsx)
-            .Select(example => example.Name);
-
-        Assert.Equal(["An interface in TypeScript", "Spawning from script"], tsx.Order());
-    }
-
-    [Fact]
     public void EveryExampleFitsThePanelAndNothingIsLostInFittingIt()
     {
         foreach (var columns in (int[])[40, 54, 80])
         {
             foreach (var example in GalleryExamples.All(new TempPictureFolder(), _ => null))
             {
-                var lines = Highlight.Lines(example.Code, Highlight.LanguageOf(example.Code));
+                var lines = Highlight.Lines(example.Code);
                 var fitted = Fit.To(lines, columns);
 
                 Assert.All(fitted, line => Assert.True(line.Length <= columns, $"{example.Name} at {columns}: \"{line.Text}\""));
@@ -118,8 +77,7 @@ public sealed class CodeViewTests
               // object: the renderer moves what moved.
               //
               // A second paragraph.
-            """,
-            CodeLanguage.CSharp);
+            """);
 
         // Forty columns, where flowing each line on its own would break them
         // somewhere else.
@@ -137,7 +95,7 @@ public sealed class CodeViewTests
     [Fact]
     public void AWordLongerThanALineIsCut()
     {
-        var lines = Highlight.Lines("// from Orblit.Gallery/Code/Highlight.cs", CodeLanguage.CSharp);
+        var lines = Highlight.Lines("// from Orblit.Gallery/Code/Highlight.cs");
 
         Assert.Equal(["// from", "// Orblit.Gallery/Co", "// de/Highlight.cs"], Texts(Fit.To(lines, 20)));
     }
@@ -149,8 +107,7 @@ public sealed class CodeViewTests
             """
                 key: 1000 + i,          // its own, for as long as it exists
                 spawn({ id: "core", at: [0, 0.4, 0], size: [0.8, 2.4, 0.8] });
-            """,
-            CodeLanguage.Tsx);
+            """);
 
         Assert.Equal(
             [
@@ -171,8 +128,7 @@ public sealed class CodeViewTests
             """
               spawn({ id: "core", at: [0, 0.4, 0], size: [0.8, 2.4, 0.8],
                       colour: "#F2F4F7" });
-            """,
-            CodeLanguage.Tsx);
+            """);
 
         Assert.Equal(
             [
@@ -197,8 +153,7 @@ public sealed class CodeViewTests
                 Intensity = 82000,                  // lux
                 FalloffRadius = 24,                 // metres
             };
-            """,
-            CodeLanguage.CSharp);
+            """);
 
         Assert.Equal(Texts(lines), Texts(Fit.To(lines, 60)));
     }

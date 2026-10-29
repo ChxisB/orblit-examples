@@ -14,7 +14,7 @@ public enum Tone
     /// <summary>What decides where execution goes next: <c>if</c>, <c>foreach</c>, <c>return</c>, <c>using</c>.</summary>
     Control,
 
-    /// <summary>Variables, members being set, named arguments and markup attributes.</summary>
+    /// <summary>Variables, members being set and named arguments.</summary>
     Name,
     Type,
     Call,
@@ -22,10 +22,4 @@ public enum Tone
     [SuppressMessage("Naming", "CA1720:Identifier contains type name", Justification = "A string literal is what it colours.")]
     String,
     Number,
-
-    /// <summary>A lower-case markup element, such as <c>&lt;box&gt;</c>.</summary>
-    Tag,
-
-    /// <summary>The angle brackets around one.</summary>
-    Bracket,
 }

@@ -38,13 +38,13 @@ public sealed class StageTests
     }
 
     [Fact]
-    public Task OnlyTheCamerasTheBenchmarkTheBlocksAndTheTwoInterfacesDrawOverTheirScene() => Headless.Run(() =>
+    public Task OnlyTheCamerasTheBenchmarkTheBlocksAndTheInterfaceDrawOverTheirScene() => Headless.Run(() =>
     {
         var drawn = Gallery.Examples()
             .Select(example => (example.Name, StageView.OverlayFor(example, () => 0)?.GetType().Name))
             .Where(pair => pair.Item2 is not null);
 
-        Assert.Equal([("Virtual cameras", "FramingOverlay"), ("Benchmark", "Readout"), ("Blocks", "WalkOverlay"), ("An interface in TypeScript", "ScriptOverlay"), ("An interface in C#", "NativeInterfaceOverlay")], drawn);
+        Assert.Equal([("Virtual cameras", "FramingOverlay"), ("Benchmark", "Readout"), ("Blocks", "WalkOverlay"), ("An interface in C#", "NativeInterfaceOverlay")], drawn);
     });
 
     [Fact]

@@ -2,32 +2,35 @@ using System.Globalization;
 using Orblit.Examples;
 using Orblit.Filament;
 using Orblit.Light;
-using Orblit.Ui;
 using Orblit.VectorMath;
 
 namespace Orblit.Gallery;
 
 /// <summary>
-/// The same kind of interface, described in C#. There is no script here and no engine. The
-/// description is built directly.
+/// A heads-up display over a scene: a chip that names the place, and a readout of power and shields.
+/// The example holds what it says, and <see cref="NativeInterfaceOverlay"/> draws it.
 /// </summary>
 /// <remarks>
-/// <para>
-/// Worth having as well as the TypeScript one, for two reasons. A game written entirely in C# should
-/// not have to embed a script engine to draw a heads-up display. The vocabulary and the builder are
-/// the useful part, and neither needs a script.
-/// </para>
-/// <para>
-/// And it shows where the boundary is. Everything below <see cref="Description"/> is the same in both
-/// examples, because the shape a script sends and the shape C# builds are one shape. That is why a
-/// script can send one at all.
-/// </para>
+/// An Orblit interface is Avalonia controls, so a game draws its display with the same controls as
+/// the rest of its window. There is nothing between the two to learn.
 /// </remarks>
 public sealed class NativeInterfaceExample : Example
 {
+    /// <summary>How wide the power bar is when full, in pixels.</summary>
+    internal const double Track = 224;
+
+    // The bar's colour, and the lit pips' a step lighter, as ARGB.
+    private static readonly (string Name, uint Bar, uint Pip)[] Accents =
+    [
+        ("ember", 0xFFC25E22, 0xFFD97B37),
+        ("steel", 0xFF3B7F97, 0xFF56A3BE),
+        ("moss", 0xFF2F7A4E, 0xFF4FA871),
+        ("rose", 0xFFC2415A, 0xFFD95E70),
+    ];
+
     public override string Name => "An interface in C#";
 
-    public override string Blurb => "The same description, built directly, with no script in the way.";
+    public override string Blurb => "A heads-up display made of Avalonia controls, changed in place as the settings change.";
 
     public override ExampleSection Section => ExampleSection.Scripting;
 
@@ -39,24 +42,20 @@ public sealed class NativeInterfaceExample : Example
 
     internal string Accent { get; set; } = "steel";
 
-    /// <summary>
-    /// Written out rather than sent. Every node is one the TypeScript example's script produces as
-    /// JSON, with the same element names and the same class lists.
-    /// </summary>
-    internal UiNode Description => new()
+    /// <summary>The power as the readout prints it, to the whole percent.</summary>
+    internal string PowerLabel => $"{Whole(Health * 100)}%";
+
+    /// <summary>How much of the track the bar fills, to the whole pixel.</summary>
+    internal double BarWidth => Math.Round(Health * Track, MidpointRounding.AwayFromZero);
+
+    internal (uint Bar, uint Pip) AccentColours
     {
-        Type = "stack",
-        Classes = "full",
-        Children =
-        [
-            new UiNode
-            {
-                Type = "column",
-                Classes = "p-5 gap-3 items-start top-0 left-0",
-                Children = [Chip, Readout],
-            },
-        ],
-    };
+        get
+        {
+            var accent = Accents.Single(one => one.Name == Accent);
+            return (accent.Bar, accent.Pip);
+        }
+    }
 
     public override RenderScene Scene(RenderCamera camera, double seconds) => new()
     {
@@ -81,89 +80,24 @@ public sealed class NativeInterfaceExample : Example
     [
         new Setting("Power", Health, 0, 1, value => Health = value),
         new Setting("Shields", Shields, 0, 5, value => Shields = (int)Math.Round(value, MidpointRounding.AwayFromZero)) { Decimals = 0 },
-        new Choice("Accent", ["ember", "steel", "moss", "rose"], Accent, option => Accent = option),
+        new Choice("Accent", [.. Accents.Select(one => one.Name)], Accent, option => Accent = option),
     ];
 
     public override string Code => """
-        // The same description, written rather than sent. No engine, no script.
+        // Plain Avalonia controls, built once.
+        var percent = new TextBlock { FontSize = 11, Foreground = Slate300 };
+        // A bar is two boxes: the track, and as much of it as is left.
+        var fill = new Border { Height = 8, CornerRadius = new CornerRadius(4), HorizontalAlignment = HorizontalAlignment.Left };
+        var track = new Border { Height = 8, CornerRadius = new CornerRadius(4), Background = Slate700, ClipToBounds = true, Child = fill };
 
-        UiNode Description => new()
+        // Then changed in place each frame, from the settings.
+        void Refresh()
         {
-            Type = "column",
-            Classes = "gap-2 px-4 py-3 rounded-lg bg-slate-900 border border-slate-700",
-            Children =
-            [
-                new UiNode { Type = "text", Classes = "text-xs uppercase text-slate-400", Text = "Power" },
-                // A bar is two boxes: the track, and as much of it as is left.
-                new UiNode
-                {
-                    Type = "box",
-                    Classes = "w-full h-2 rounded-full bg-slate-700 clip",
-                    Children =
-                    [
-                        new UiNode
-                        {
-                            Type = "box",
-                            Classes = $"h-2 rounded-full bg-{Accent}-500",
-                            Css = $"width: {Math.Round(Health * 224)}px",
-                        },
-                    ],
-                },
-            ],
-        };
-
-        // And then, exactly as in the TypeScript example:
-        new UiBuilder(new UiBuilderOptions()).Build(Description);
+            percent.Text = $"{Math.Round(Health * 100, MidpointRounding.AwayFromZero)}%";
+            fill.Width = Math.Round(Health * 224, MidpointRounding.AwayFromZero);
+            fill.Background = BarColourOf(Accent);
+        }
         """;
-
-    private UiNode Chip => new()
-    {
-        Type = "row",
-        Classes = "gap-3 items-center px-4 py-3 rounded-lg bg-slate-900 border border-slate-700 shadow",
-        Css = "opacity: 0.94",
-        Children =
-        [
-            new UiNode { Type = "box", Classes = $"w-3 h-3 rounded-full bg-{Accent}-500" },
-            new UiNode { Type = "text", Classes = "text-lg font-semibold text-slate-100", Text = "Docking bay" },
-            new UiNode { Type = "text", Classes = "text-sm text-slate-400", Text = "· clear" },
-        ],
-    };
-
-    private UiNode Readout => new()
-    {
-        Type = "column",
-        Classes = "gap-2 px-4 py-3 rounded-lg bg-slate-900 border border-slate-700 w-64",
-        Css = "opacity: 0.94",
-        Children =
-        [
-            new UiNode
-            {
-                Type = "row",
-                Classes = "justify-between items-center",
-                Children =
-                [
-                    new UiNode { Type = "text", Classes = "text-xs uppercase text-slate-400", Text = "Power" },
-                    new UiNode { Type = "text", Classes = "text-xs text-slate-300", Text = $"{Whole(Health * 100)}%" },
-                ],
-            },
-            // A bar is two boxes: the track, and as much of it as is left. No progress control, and
-            // no second component set.
-            new UiNode
-            {
-                Type = "box",
-                Classes = "w-full h-2 rounded-full bg-slate-700 clip",
-                Children = [new UiNode { Type = "box", Classes = $"h-2 rounded-full bg-{Accent}-500", Css = $"width: {Whole(Health * 224)}px" }],
-            },
-            // A row of pips, which in C# is a query and in TypeScript is a map. The description does
-            // not know or care.
-            new UiNode
-            {
-                Type = "row",
-                Classes = "gap-1 pt-2",
-                Children = [.. Enumerable.Range(0, 5).Select(i => new UiNode { Type = "box", Classes = $"w-6 h-1 rounded-full {(i < Shields ? $"bg-{Accent}-400" : "bg-slate-700")}" })],
-            },
-        ],
-    };
 
     private static RenderObject Ground
     {

@@ -37,8 +37,6 @@ internal sealed class CodeView : Border
         [Tone.Call] = GalleryColours.Of(0xFFDCDCAA),
         [Tone.String] = GalleryColours.Of(0xFFCE9178),
         [Tone.Number] = GalleryColours.Of(0xFFB5CEA8),
-        [Tone.Tag] = GalleryColours.Of(0xFF569CD6),
-        [Tone.Bracket] = GalleryColours.Of(0xFF808080),
     };
 
     private readonly Action? _close;
@@ -55,7 +53,7 @@ internal sealed class CodeView : Border
     private readonly FoldButton? _fold;
     private readonly Glyph _chevron = new(Glyph.ChevronDown, 16, GalleryColours.Quiet);
     private readonly TextBlock _title = new() { FontSize = 13, FontWeight = FontWeight.SemiBold, Foreground = GalleryColours.Name, Margin = new Thickness(0, 0, 10, 0) };
-    private readonly TextBlock _language = new() { FontSize = 10.5, LetterSpacing = 0.6, FontWeight = FontWeight.SemiBold, Foreground = GalleryColours.Title };
+    private readonly TextBlock _language = new() { Text = "C#", FontSize = 10.5, LetterSpacing = 0.6, FontWeight = FontWeight.SemiBold, Foreground = GalleryColours.Title };
     private readonly TextBlock _count = new() { FontSize = 10.5, Foreground = GalleryColours.Quiet, Margin = new Thickness(8, 0, 0, 0) };
     private readonly TextBlock _copied = new() { Text = "Copied", FontSize = 11, Foreground = GalleryColours.Of(0xFF7FB88A), Margin = new Thickness(0, 0, 2, 0), IsVisible = false, VerticalAlignment = VerticalAlignment.Center };
     private readonly Glyph _copyGlyph = new(Glyph.Copy, 14, GalleryColours.Blurb);
@@ -128,9 +126,7 @@ internal sealed class CodeView : Border
         }
 
         _source = source;
-        var language = Highlight.LanguageOf(source);
-        _lines = Highlight.Lines(source, language);
-        _language.Text = language.Label();
+        _lines = Highlight.Lines(source);
         _count.Text = $"{_lines.Count} lines";
         // Asked of one example, so it goes back to the first rows for the next.
         _whole = false;

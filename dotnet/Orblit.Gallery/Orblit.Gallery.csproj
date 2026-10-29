@@ -12,14 +12,7 @@
     <PackageReference Include="Orblit.Examples" />
     <PackageReference Include="Orblit.Filament.Avalonia" />
     <PackageReference Include="Orblit.Physics.Soft" />
-    <PackageReference Include="Orblit.Script" />
-    <PackageReference Include="Orblit.Script.Scene" />
-    <PackageReference Include="Orblit.Script.Ui" />
     <PackageReference Include="Orblit.Stage" />
-  </ItemGroup>
-  <!-- What gallery/script/*.tsx compile to, as the gallery's TypeScript examples run them. -->
-  <ItemGroup>
-    <EmbeddedResource Include="Scripts/*.js" LogicalName="%(Filename)%(Extension)" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Orblit.Gallery.Tests" />
