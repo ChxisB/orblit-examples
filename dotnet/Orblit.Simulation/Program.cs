@@ -20,8 +20,8 @@ internal static class Program
                 sim.Step(0.2f);
             }
 
-            var b = Simulation.WorldPositionOf(sim.World, sim.Transforms, body);
-            var c = Simulation.WorldPositionOf(sim.World, sim.Transforms, carried);
+            var b = sim.WorldPositionOf(body);
+            var c = sim.WorldPositionOf(carried);
             Console.WriteLine($"{tick,-6}{Format(b),-24}{Format(c)}");
         }
     }

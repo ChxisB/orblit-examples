@@ -18,9 +18,9 @@ public sealed class SimulationTests(ITestOutputHelper output)
         }
 
         // Two units per second for one second.
-        Assert.Equal(2, Simulation.WorldPositionOf(sim.World, sim.Transforms, body).X, 1e-4);
+        Assert.Equal(2, sim.WorldPositionOf(body).X, 1e-4);
         // The attachment travels with what carries it.
-        var child = Simulation.WorldPositionOf(sim.World, sim.Transforms, carried);
+        var child = sim.WorldPositionOf(carried);
         Assert.Equal(2, child.X, 1e-4);
         Assert.Equal(1, child.Y, 1e-4);
     }
@@ -34,18 +34,23 @@ public sealed class SimulationTests(ITestOutputHelper output)
         sim.SetSpin(body, Math.PI);
         sim.Step(0);
 
-        // A turn about Y leaves something directly above unmoved.
-        var position = Simulation.WorldPositionOf(sim.World, sim.Transforms, carried);
+        // A turn about Y leaves something directly above unmoved, so its matrix shows the turn.
+        var position = sim.WorldPositionOf(carried);
         Assert.Equal(2, position.Y, 1e-4);
         Assert.Equal(0, position.X, 1e-4);
+        Assert.True(sim.World.TryGetFloat32(carried, sim.Transforms.World, out var matrix));
+        // Its X axis now points along -X.
+        Assert.Equal(-1, matrix[0], 1e-4);
+        Assert.Equal(0, matrix[1], 1e-4);
+        Assert.Equal(0, matrix[2], 1e-4);
     }
 
     [Fact]
     public async Task TheWholeSliceComposesSimulatePropagateReplicate()
     {
         await using var pair = new Pair();
-        // Both replicate, but only by their world transforms. The client is told where things
-        // are, not how they got there.
+        // Both replicate by their world transforms and not their parent links. The client is told
+        // where things are, not how they got there.
         var body = pair.Host.SpawnBody(0, 0, speed: 3);
         var carried = pair.Host.Attach(body, offsetY: 1);
         var bodyId = pair.NetHost.Spawn(body);
@@ -60,15 +65,15 @@ public sealed class SimulationTests(ITestOutputHelper output)
 
         Assert.Equal(2, pair.NetClient.EntityCount);
 
-        var hostBody = Simulation.WorldPositionOf(pair.Host.World, pair.Host.Transforms, body);
-        var replicaBody = Simulation.WorldPositionOf(pair.Replica.World, pair.Replica.Transforms, pair.NetClient.EntityFor(bodyId)!.Value);
+        var hostBody = pair.Host.WorldPositionOf(body);
+        var replicaBody = pair.Replica.WorldPositionOf(pair.NetClient.EntityFor(bodyId)!.Value);
         Assert.Equal(hostBody.X, replicaBody.X, 1e-4);
         Assert.Equal(3, hostBody.X, 1e-3);
 
         // The attachment arrives already in world space, with no parent link on the client.
         var replicaCarriedEntity = pair.NetClient.EntityFor(carriedId)!.Value;
-        var hostCarried = Simulation.WorldPositionOf(pair.Host.World, pair.Host.Transforms, carried);
-        var replicaCarried = Simulation.WorldPositionOf(pair.Replica.World, pair.Replica.Transforms, replicaCarriedEntity);
+        var hostCarried = pair.Host.WorldPositionOf(carried);
+        var replicaCarried = pair.Replica.WorldPositionOf(replicaCarriedEntity);
         Assert.Equal(hostCarried.X, replicaCarried.X, 1e-4);
         Assert.Equal(1, replicaCarried.Y, 1e-4);
 
@@ -99,8 +104,8 @@ public sealed class SimulationTests(ITestOutputHelper output)
         stopwatch.Stop();
 
         Assert.Equal(count, pair.NetClient.EntityCount);
-        // The last row moved as far as the first, so the pass walks each row's own transform.
-        Assert.Equal(count - 1 + (10 / 60f), Simulation.WorldPositionOf(pair.Host.World, pair.Host.Transforms, last).X, 1e-3);
+        // The last row moved by its own velocity, so the pass walks each row's own transform.
+        Assert.Equal(count - 1 + (10 / 60f), pair.Host.WorldPositionOf(last).X, 1e-3);
         output.WriteLine($"{count} bodies, 10 ticks of simulate, propagate and replicate: {stopwatch.ElapsedMilliseconds} ms");
     }
 
