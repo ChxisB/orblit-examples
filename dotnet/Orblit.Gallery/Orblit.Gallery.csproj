@@ -11,6 +11,8 @@
     <PackageReference Include="Avalonia.Themes.Fluent" />
     <PackageReference Include="Orblit.Examples" />
     <PackageReference Include="Orblit.Filament.Avalonia" />
+    <PackageReference Include="Orblit.Physics.Soft" />
+    <PackageReference Include="Orblit.Stage" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Orblit.Gallery.Tests" />
