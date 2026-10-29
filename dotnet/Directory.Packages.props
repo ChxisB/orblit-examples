@@ -17,6 +17,9 @@
     <PackageVersion Include="Orblit.Examples" Version="0.2.0" />
     <PackageVersion Include="Orblit.Filament.Avalonia" Version="0.1.0" />
     <PackageVersion Include="Orblit.Physics.Soft" Version="0.2.0" />
+    <PackageVersion Include="Orblit.Script" Version="0.1.0" />
+    <PackageVersion Include="Orblit.Script.Scene" Version="0.1.0" />
+    <PackageVersion Include="Orblit.Script.Ui" Version="0.1.0" />
     <PackageVersion Include="Orblit.Stage" Version="0.5.0" />
   </ItemGroup>
 </Project>

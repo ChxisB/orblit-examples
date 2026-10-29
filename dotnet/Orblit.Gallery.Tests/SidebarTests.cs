@@ -22,7 +22,7 @@ public sealed class SidebarTests
         Gallery.Text(window, "Virtual cameras");
         // ...and the others are folded.
         Assert.Empty(Gallery.Texts(window, "Blocks"));
-        Assert.Empty(Gallery.Texts(window, "Lights"));
+        Assert.Empty(Gallery.Texts(window, "Spawning from script"));
         window.Close();
     });
 

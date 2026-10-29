@@ -82,6 +82,16 @@ public sealed class CodeViewTests
     }
 
     [Fact]
+    public void OnlyTheTwoScriptExamplesAreReadAsTsx()
+    {
+        var tsx = GalleryExamples.All(new TempPictureFolder(), _ => null)
+            .Where(example => Highlight.LanguageOf(example.Code) == CodeLanguage.Tsx)
+            .Select(example => example.Name);
+
+        Assert.Equal(["An interface in TypeScript", "Spawning from script"], tsx.Order());
+    }
+
+    [Fact]
     public void EveryExampleFitsThePanelAndNothingIsLostInFittingIt()
     {
         foreach (var columns in (int[])[40, 54, 80])

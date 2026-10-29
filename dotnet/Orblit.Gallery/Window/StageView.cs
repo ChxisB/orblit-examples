@@ -120,6 +120,7 @@ internal sealed class StageView : Border
         CamerasExample cameras => new FramingOverlay(cameras),
         VoxelExample voxels => new WalkOverlay(voxels),
         BenchmarkExample benchmark => new Readout(benchmark, gpuMilliseconds),
+        InterfaceExample face => new ScriptOverlay(face),
         _ => null,
     };
 
