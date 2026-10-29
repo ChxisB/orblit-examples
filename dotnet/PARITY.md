@@ -15,6 +15,8 @@ them, into `~/.orblit/feed` unless `ORBLIT_FEED` names another.
 The cloth needs `Orblit.Physics` and `Orblit.Physics.Soft` from the
 `orblit-physics` repository. Its `tool/build_native.sh` builds the solver, and
 `dotnet pack -c Release -o ~/.orblit/feed` on each of the two projects packs it.
+The simulation needs `Orblit.Net` from the `orblit-net` repository, packed the
+same way from its `dotnet/Orblit.Net` project.
 `Directory.Packages.props` pins the versions.
 
 ## The gallery
@@ -31,3 +33,15 @@ The cloth needs `Orblit.Physics` and `Orblit.Physics.Soft` from the
 | none, the Dart has no test | `StageTests` | 0 | 0 | 0 | 5: what a model holds and the first fault the renderer reports, which examples draw over their scene, the reason shown with no renderer, a file read in the background handed over on the UI thread, and the device given to the example with what it could not load | added |
 | none, the Dart has no test | `OverlayTests` | 0 | 0 | 0 | 17: the framing names the live shot, the guides shade and box, six keys named by their W3C codes, a held key let go on focus loss, a drag looks and a click digs and a right click puts one back, five frame costs each in its colour, the cost read four times a second, and the note card | added |
 | none, the Dart has no test | `SettingsTests` | 0 | 0 | 0 | 1: an entry for a file has a button that says whether one is chosen | added |
+
+## The simulation
+
+| Dart test file | C# class | Dart declared | Dart run | C# ported | Added in C# | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| `simulation_test.dart` | `SimulationTests` | 4 | 4 | 4 | 0 | done. The thousand-body test also checks the last body moved. The Dart checked only the count, so a wrong row stride passed |
+
+## The viewport
+
+| Dart test file | C# class | Dart declared | Dart run | C# ported | Added in C# | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| `widget_test.dart` | `ViewportWindowTests` | 2 | 2 | 2 | 1: the slider resizes the stage's column | done. The Dart view drew the native code's own scene. Here the host hands the renderer a turning cube each frame |
