@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Orblit.Gallery.Tests;
 
 namespace Orblit.Viewport.Tests;
 
