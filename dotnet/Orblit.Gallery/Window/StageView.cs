@@ -26,11 +26,12 @@ internal sealed class StageView : Border
     /// <param name="showing">The example to show first.</param>
     /// <param name="renderer">Whether to draw with the renderer, which runs on macOS so far.</param>
     /// <param name="orbit">How fast the camera circles on its own, in radians a second.</param>
-    public StageView(Example showing, bool renderer, double orbit)
+    /// <param name="view">Where the camera looks from first, which is the example's own unless the launch framed it.</param>
+    public StageView(Example showing, bool renderer, double orbit, ViewPoint view)
     {
         _showing = showing;
         _orbit = orbit;
-        View = showing.ViewPoint;
+        View = view;
         _facing = View.Yaw;
         // Without a background a drag on the stage would fall through it.
         Background = Brushes.Transparent;

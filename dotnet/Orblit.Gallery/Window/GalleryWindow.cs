@@ -12,6 +12,7 @@ namespace Orblit.Gallery;
 /// </summary>
 internal sealed class GalleryWindow : Window
 {
+    private readonly Launch _launch;
     private readonly StageView _stage;
     private readonly TextBlock? _name;
     private readonly TextBlock? _blurb;
@@ -29,8 +30,9 @@ internal sealed class GalleryWindow : Window
         Title = "Orblit Examples";
         Width = 1600;
         Height = 1000;
+        _launch = launch;
         var showing = launch.Opening(examples);
-        _stage = new StageView(showing, renderer, launch.Orbit);
+        _stage = new StageView(showing, renderer, launch.Orbit, launch.Framed(showing.ViewPoint));
         if (launch.Bare)
         {
             Background = Brushes.Black;
@@ -132,7 +134,7 @@ internal sealed class GalleryWindow : Window
     {
         _requested = false;
         _started ??= now;
-        _stage.Draw((now - _started.Value).TotalSeconds);
+        _stage.Draw(_launch.Clock((now - _started.Value).TotalSeconds));
         // An example's settings can change as it runs, such as a count that rises, so they are read again each frame.
         _settings?.Refresh();
         RequestFrame();

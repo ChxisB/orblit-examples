@@ -58,7 +58,7 @@ public sealed class StageTests
     public Task WithoutTheRendererNothingIsDrawnOverTheReasonWhy() => Headless.Run(() =>
     {
         var cameras = new CamerasExample { Note = "Something to say" };
-        var stage = new StageView(cameras, renderer: false, orbit: 0);
+        var stage = new StageView(cameras, renderer: false, orbit: 0, cameras.ViewPoint);
         var window = new Window { Width = 400, Height = 300, Content = stage };
         window.Show();
 
@@ -93,7 +93,7 @@ public sealed class StageTests
     {
         var meshes = Gallery.Examples().OfType<MeshesExample>().Single();
         OverlayTests.Control<TextEntry>(meshes, "Path to a .glb or .gltf").Change("/nowhere/crate.glb");
-        var stage = new StageView(meshes, renderer: true, orbit: 0);
+        var stage = new StageView(meshes, renderer: true, orbit: 0, meshes.ViewPoint);
         var window = new Window { Width = 320, Height = 200, Content = stage };
         window.Show();
 

@@ -46,6 +46,13 @@ tutorial, and they share nothing but the surface they draw on.
 `ORBLIT_EXAMPLE=weather` opens on one of them by name, which is handy for a
 screenshot or a demo that should start where it means to.
 
+The C# gallery reads more switches, so a sweep is a shell loop. `ORBLIT_YAW`,
+`ORBLIT_PITCH` and `ORBLIT_DISTANCE` frame the camera. `ORBLIT_SECONDS` holds
+the clock at one time. `ORBLIT_EXAMPLE=blocks ORBLIT_SET="Relief=9; Trees=off"` sets
+settings of the opening example by label, and `ORBLIT_WALK=1` is its `Walk`
+toggle. A switch that cannot be applied is named on stderr and the rest still
+run.
+
 ## Why these run against git dependencies
 
 The engine, networking and examples are separate repositories, so each example
