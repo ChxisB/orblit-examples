@@ -32,7 +32,7 @@ public sealed class NativeInterfaceExample : Example
 
     public override string Blurb => "A heads-up display made of Avalonia controls, changed in place as the settings change.";
 
-    public override ExampleSection Section => ExampleSection.Scripting;
+    public override ExampleSection Section => ExampleSection.Interface;
 
     public override ViewPoint ViewPoint => new() { Distance = 12, Pitch = 0.22 };
 
