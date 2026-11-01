@@ -1,5 +1,10 @@
 # Parity
 
+The port is finished. The Dart is no longer in this repository. The last
+commit that has it is tagged `dart-final`, and the Dart test files named below
+are read at that tag. The recorded scene for the interface in the world is
+`Orblit.Gallery.Tests/fixtures/world_ui.json`.
+
 One row per Dart test file that has been ported. A row is added when the file
 is built.
 
@@ -8,8 +13,6 @@ tests that execute, because a loop runs one declaration many times. C# ported
 counts the C# tests that carry a Dart test over. Added in C# counts tests with
 no Dart twin. A file is done when C# ported equals Dart run, less the tests a
 decision drops.
-
-The Dart is deleted. The tag `dart-final` holds the last Dart commit.
 
 The rules are the engine's `dotnet/PORTING.md`, in the `orblit` repository. The
 engine packages come from a folder. The engine's `tool/pack_local.sh` packs
@@ -32,7 +35,7 @@ same way from its `dotnet/Orblit.Net` project.
 | none, the Dart has no test | `SettingByLabelTests` | 0 | 0 | 0 | 17: a slider set and settled as when its handle is let go, a choice and a toggle and an entry found by label in any case, a toggle taking the words a person would use, a missing label naming the ones there are, an item that cannot be set, a row with nothing to act on, a caption and a button, and a later item seeing what the earlier one changed | added |
 | none, the Dart has no test | `ClothTests` | 0 | 0 | 0 | 7: the pole holds the first column, the gusts flap the flag and a calm one hangs flat, six steps caught up and a jump taking none, the same flag however the frames fall, the sheet handed over once under its versioned name, the note without a renderer, and the gallery's cloth in the real resource table | added |
 | `world_ui_test.dart` | `WorldUiSceneTests`, `WorldUiOverlayTests` | 1 | 5 | 5 | 15: the fixture is from committed source, every frame before the first picture and the controls are the fixture's, a control moved before the picture leaves the scene as the fixture shows it (2), no names leaves the room and the crowd, distinct text draws another picture and lets go of the old one, half a name rounds up, the slider sets the sun, letting go releases both pictures and takes the screen out of the scene, a press on the screen does not orbit, a drag along the slider and back, a press the system takes back is not a click and leaves the screen free, the face counts its presses and its slider sets the daylight, taking the overlay off the stage takes the screen down | done. The Dart declared 1 test in a helper and ran it 5 times. The screen is real Avalonia controls drawn by `PanelHost`, where the Dart drew Flutter widgets. The 300 frames and 63 keys the engine fixture holds for this example are frozen into `fixtures/world_ui.json` here, because the engine's tests cannot see this example. They match until the first picture is synced, since the Dart scene lacked the pictures too. A pointer reaches the screen only after the host has drawn it a frame or two, so the tests render twice first. The cost test keeps the Dart's loose bounds: a frame under 25 ms, a press to a picture under a second and two hundred names under two |
-| `interface_script_test.dart` | none | 6 | 6 | 0 | 0 | not ported. Decision 94 takes Orblit Script out of the C# engine |
+| `interface_script_test.dart` | none | 6 | 6 | 0 | 0 | not ported. Decision 94 leaves a script runtime out of the C# engine |
 | `native_interface_test.dart` | `NativeInterfaceTests` | 2 | 2 | 1 | 3: halves round up in the percent and the bar, the settings are what the display shows with each number rounded as the slider shows it, and the stage changes the controls it has rather than making new ones | done. Decision 95 drops the vocabulary test, because the display is Avalonia controls. The layout test also checks the bar's width |
 | none, the Dart has no test | `StageTests` | 0 | 0 | 0 | 5: what a model holds and the first fault the renderer reports, which examples draw over their scene, the reason shown with no renderer, a file read in the background handed over on the UI thread, and the device given to the example with what it could not load | added |
 | none, the Dart has no test | `OverlayTests` | 0 | 0 | 0 | 17: the framing names the live shot, the guides shade and box, six keys named by their W3C codes, a held key let go on focus loss, a drag looks and a click digs and a right click puts one back, five frame costs each in its colour, the cost read four times a second, and the note card | added |
