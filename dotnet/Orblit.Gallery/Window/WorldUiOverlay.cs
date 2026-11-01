@@ -56,7 +56,9 @@ internal sealed class WorldUiOverlay : Border, IStageLayer
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
-        if (_held is not null || _example.Wall is not { } wall || RayOf(e) is not { } ray || !wall.Hits(ray))
+        // Touch and a pen report the left button, so the primary press is the only one that clicks.
+        if (_held is not null || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed
+            || _example.Wall is not { } wall || RayOf(e) is not { } ray || !wall.Hits(ray))
         {
             return;
         }

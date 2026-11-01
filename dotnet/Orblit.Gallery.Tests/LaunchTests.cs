@@ -23,6 +23,19 @@ public sealed class LaunchTests
         Assert.Equal(0, Launch.From(Only("ORBLIT_ORBIT", "fast")).Orbit);
     }
 
+    [Theory]
+    [InlineData("NaN")]
+    [InlineData("Infinity")]
+    [InlineData("-Infinity")]
+    public void ANumberThatIsNotFiniteIsNone(string value)
+    {
+        var launch = Launch.From(Named(("ORBLIT_ORBIT", value), ("ORBLIT_YAW", value), ("ORBLIT_SECONDS", value)));
+
+        Assert.Equal(0, launch.Orbit);
+        Assert.Null(launch.Yaw);
+        Assert.Null(launch.Seconds);
+    }
+
     [Fact]
     public void TheViewIsTheExamplesOwnUntilALaunchNamesOneOfItsNumbers()
     {

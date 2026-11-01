@@ -32,8 +32,8 @@ internal sealed record Launch(string? Example, bool Bare, double Orbit)
 
     /// <summary>
     /// The settings to set on the example that opens, each written <c>Label=value</c>, in the order
-    /// they were named. <c>ORBLIT_SET</c> holds several apart by semicolons, and <c>ORBLIT_WALK</c>
-    /// is the one named <c>Walk</c>.
+    /// they were named. <c>ORBLIT_SET</c> holds several apart by semicolons, so a value cannot hold
+    /// one, and <c>ORBLIT_WALK</c> is the one named <c>Walk</c>.
     /// </summary>
     public IReadOnlyList<string> Settings { get; init; } = [];
 
@@ -73,7 +73,7 @@ internal sealed record Launch(string? Example, bool Bare, double Orbit)
     }
 
     private static double? Number(Func<string, string?> environment, string name) =>
-        double.TryParse(environment(name), NumberStyles.Float, CultureInfo.InvariantCulture, out var number) ? number : null;
+        double.TryParse(environment(name), NumberStyles.Float, CultureInfo.InvariantCulture, out var number) && double.IsFinite(number) ? number : null;
 
     // Held with the other settings, since the voxel walk's switch is the setting called Walk.
     private static IEnumerable<string> Walk(string? value) =>

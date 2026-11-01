@@ -50,6 +50,19 @@ public sealed class WorldUiOverlayTests
     });
 
     [Fact]
+    public Task OnlyTheLeftButtonPressesTheScreen() => Headless.Run(() =>
+    {
+        using var booth = Booth.Open();
+        var at = booth.Aim(Button);
+
+        booth.Window.MouseDown(at, MouseButton.Right);
+        booth.Window.MouseUp(at, MouseButton.Right);
+
+        Assert.Equal(0, booth.Example.Presses);
+        Assert.Equal(1, booth.Orbits);
+    });
+
+    [Fact]
     public Task APressThatBeginsOnTheScreenDoesNotOrbitAndOneBesideItDoes() => Headless.Run(() =>
     {
         using var booth = Booth.Open();
