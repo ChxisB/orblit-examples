@@ -11,8 +11,7 @@ using Orblit.Filament;
 namespace Orblit.Gallery.Tests;
 
 /// <summary>
-/// What three examples draw over their scene, each on its own in a window. The Dart drew these in
-/// widgets no test reached.
+/// What three examples draw over their scene, each on its own in a window.
 /// </summary>
 public sealed class OverlayTests
 {

@@ -7,9 +7,10 @@ using Orblit.Filament;
 namespace Orblit.Gallery.Tests;
 
 /// <summary>
-/// The bytes the Dart exporter digests, written the same way, for the one example whose fixture case
-/// lives here. A message value is its type letter, its length and its raw bytes. A digest is FNV-1a over
-/// 64 bits. The engine's tests keep the same code for the rest, because they cannot be seen from here.
+/// The bytes the recorded digests were made from, written the same way, for the one example whose
+/// fixture case lives here. A message value is its type letter, its length and its raw bytes. A digest
+/// is FNV-1a over 64 bits. The engine's tests keep the same code for the rest, because they cannot be
+/// seen from here.
 /// </summary>
 internal static class SceneDigest
 {

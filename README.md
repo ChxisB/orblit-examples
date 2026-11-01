@@ -4,39 +4,47 @@ Worked examples of what [Orblit](https://github.com/ChxisB/orblit) can do,
 and how. Each one is small enough to read in a sitting, and does one thing
 properly rather than being a game with the technique buried in it.
 
+The examples are C# on Avalonia. You need the .NET 10 SDK.
+
 ```sh
-# Clone the engine and networking beside this one, then:
-./tool/link_local.sh
+# Clone orblit, orblit-net and orblit-physics beside this one, then fill the
+# local feed the packages restore from:
+orblit/tool/pack_local.sh
+dotnet pack orblit-net/dotnet/Orblit.Net -c Release -o ~/.orblit/feed
+orblit-physics/tool/build_native.sh
+dotnet pack orblit-physics/dotnet/Orblit.Physics -c Release -o ~/.orblit/feed
+dotnet pack orblit-physics/dotnet/Orblit.Physics.Soft -c Release -o ~/.orblit/feed
 ```
 
 | Example | What it shows |
 | --- | --- |
-| [`gallery`](gallery) | Every rendering technique, one at a time: pick from the list, change it with the settings, and read the lines that do it. macOS. |
-| [`viewport`](viewport) | A Filament scene drawn as an ordinary Flutter widget. It lays out, it clips, and it sits beside a panel that resizes it. macOS. |
-| [`simulation`](simulation) | The engine with no window: an entity-component world, a transform hierarchy, a system written in Dart over column views, and the result replicated to a second world. |
+| [`Orblit.Gallery`](dotnet/Orblit.Gallery) | Every rendering technique, one at a time: pick from the list, change it with the settings, and read the lines that do it. macOS. |
+| [`Orblit.Viewport`](dotnet/Orblit.Viewport) | A Filament scene drawn as an ordinary Avalonia control. It lays out, it clips, and it sits beside a panel that resizes it. macOS. |
+| [`Orblit.Simulation`](dotnet/Orblit.Simulation) | The engine with no window: an entity-component world, a transform hierarchy, a system written over column views, and the result replicated to a second world. |
 
 ```sh
-cd gallery && flutter run -d macos
-cd viewport && flutter run -d macos
-dart run simulation/bin/simulation.dart
+dotnet run --project dotnet/Orblit.Gallery -c Release
+dotnet run --project dotnet/Orblit.Viewport -c Release
+dotnet run --project dotnet/Orblit.Simulation -c Release
 ```
+
+`./tool/check_dotnet.sh` builds, tests and checks the format.
 
 ## The gallery
 
 Each example is one file and stands on its own. What it needs to work is what
 is written in it, and that is what the panel on the right shows.
 
-Most of them live in the engine's own `orblit_examples` package rather than
+Most of them live in the engine's own `Orblit.Examples` package rather than
 here, because the editor shows the same ones beside the projects somebody is
 working on. An example written twice is an example that drifts. What stays
-here are the three that run TypeScript, next to the scripting runtime they
-need. In the shared package they would force every host of it to build QuickJS
-just to show eleven examples that never touch it. They are not steps in a
-tutorial, and they share nothing but the surface they draw on.
+here are the three that need more than that package gives: the cloth, which
+uses the physics solver, the interface in a window and the interface in the
+world. They are not steps in a tutorial, and they share nothing but the
+surface they draw on.
 
 | | |
 | --- | --- |
-| A scene as a widget | A lit surface composited by Flutter, laid out like any other widget. |
 | Lights | Sun, point and spot, in lux and lumens, with the shadows each casts. |
 | Day and night | A sun and a moon crossing the sky, with the camera metered for both. |
 | Weather | Haze, banks of cloud and falling weather, carried by one wind. |
@@ -53,14 +61,13 @@ settings of the opening example by label, and `ORBLIT_WALK=1` is its `Walk`
 toggle. A switch that cannot be applied is named on stderr and the rest still
 run.
 
-## Why these run against git dependencies
+## Where the packages come from
 
-The engine, networking and examples are separate repositories, so each example
-declares what it needs by git reference. `tool/link_local.sh` swaps those for
-sibling checkouts while you work. The overrides it writes are not committed, so
-nothing ships wired to a path on one machine. The gallery needs the scripting
-and physics checkouts as well: `./tool/link_local.sh ../orblit ../orblit-net
-../orblit-script ../orblit-physics`.
+The engine, networking, physics and examples are separate repositories, and
+there is no public NuGet feed yet. Each repository packs its libraries into
+`~/.orblit/feed`, and `dotnet/Directory.Packages.props` pins the versions the
+examples restore from there. `ORBLIT_FEED` names another feed folder for the
+engine's `tool/pack_local.sh`.
 
 ## Licence
 

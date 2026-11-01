@@ -5,144 +5,96 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
-    inputs:
-      channel:
-        description: 'Flutter channel to build against'
-        required: false
-        default: stable
-        type: choice
-        options: [stable, beta, master]
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-env:
-  FLUTTER_CHANNEL: ${{ inputs.channel || 'stable' }}
-
 jobs:
-  check:
-    name: Simulation
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          path: orblit-examples
-
-      # The engine and networking are separate private repositories, so CI
-      # checks them out and links against them rather than resolving git
-      # dependencies it has no credentials for.
-      - uses: actions/checkout@v4
-        with:
-          # No token: these repositories are public, so the default
-          # GITHUB_TOKEN reads them. Nothing here needs a secret.
-          repository: ChxisB/orblit
-          path: orblit
-      - uses: actions/checkout@v4
-        with:
-          repository: ChxisB/orblit-net
-          path: orblit-net
-
-      - uses: dart-lang/setup-dart@v1
-        with:
-          sdk: 3.13.0
-
-      - name: Link local checkouts
-        working-directory: orblit-examples
-        run: ./tool/link_local.sh ../orblit ../orblit-net
-
-      - name: Check
-        working-directory: orblit-examples
-        run: ./tool/check.sh
-
-  # The two apps that draw. Both were checked by nothing before: the job above
-  # runs on Linux and skips them, so a change that broke the gallery reached
-  # main looking green.
-  apps:
-    name: Apps (macOS)
-    runs-on: macos-latest
+  # The packages come from three other repositories, which CI packs into a
+  # local feed. The engine branch with this branch's name is the pair when
+  # there is one, so a change here and the engine change it needs build
+  # together. Without one it uses the engine's default branch. The renderer
+  # runs on macOS so far, so tests that need it skip elsewhere.
+  dotnet:
+    name: .NET (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
         with:
           path: orblit-examples
+
+      - id: engine
+        shell: bash
+        run: |
+          branch="${{ github.head_ref || github.ref_name }}"
+          if git ls-remote --exit-code --heads \
+              https://github.com/ChxisB/orblit.git "$branch" > /dev/null; then
+            echo "Building against ChxisB/orblit@$branch"
+            echo "ref=$branch" >> "$GITHUB_OUTPUT"
+          else
+            echo "No matching engine branch; using its default"
+            echo "ref=" >> "$GITHUB_OUTPUT"
+          fi
+
+      # No token: these repositories are public, so the default GITHUB_TOKEN
+      # reads them. Nothing here needs a secret.
       - uses: actions/checkout@v4
         with:
           repository: ChxisB/orblit
+          ref: ${{ steps.engine.outputs.ref }}
           path: orblit
       - uses: actions/checkout@v4
         with:
           repository: ChxisB/orblit-net
           path: orblit-net
-      # The gallery shows the scripted examples, so scripting has to be here
-      # too or its dependencies do not resolve.
       # The gallery's cloth moves with the physics repository's solver.
       - uses: actions/checkout@v4
         with:
           repository: ChxisB/orblit-physics
           path: orblit-physics
-      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
         with:
-          repository: ChxisB/orblit-script
-          path: orblit-script
-          # QuickJS is a pinned submodule, and the interpreter is compiled
-          # from its sources at build time. Without this the checkout stops
-          # at the gitlink and clang fails on a list of .c files that are not
-          # there.
-          submodules: recursive
+          global-json-file: orblit-examples/dotnet/global.json
 
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: ${{ env.FLUTTER_CHANNEL }}
-          cache: true
+      # The runner context exists in a step and not in a job's env, so the
+      # feed folder is named on each step that reads it.
+      - name: Pack the engine
+        shell: bash
+        working-directory: orblit
+        env:
+          ORBLIT_FEED: ${{ runner.temp }}/feed
+        run: tool/pack_local.sh
 
-      - name: Cache Filament SDK
-        uses: actions/cache@v4
-        with:
-          path: orblit/packages/orblit_filament/darwin/third_party
-          key: filament-${{ runner.os }}-${{ hashFiles('orblit/packages/orblit_filament/darwin/setup.sh') }}
+      - name: Pack networking
+        shell: bash
+        working-directory: orblit-net
+        env:
+          ORBLIT_FEED: ${{ runner.temp }}/feed
+        run: dotnet pack dotnet/Orblit.Net -c Release -o "${{ runner.temp }}/feed" --nologo -v q
 
-      # Fetches the Filament SDK and compiles the materials into the C
-      # arrays the renderer includes. This runs from the podspec's
-      # prepare_command under CocoaPods, and Swift Package Manager has no
-      # equivalent hook — a package plugin runs sandboxed, with no network —
-      # so on the SPM path, which is now Flutter's default for macOS, nothing
-      # runs it and the build fails on a missing generated header. It is
-      # idempotent, so calling it here is free when the cache is warm.
-      - name: Fetch Filament and compile materials
-        run: bash orblit/packages/orblit_filament/darwin/setup.sh
+      - name: Pack physics
+        shell: bash
+        working-directory: orblit-physics
+        env:
+          ORBLIT_FEED: ${{ runner.temp }}/feed
+        run: |
+          tool/build_native.sh
+          dotnet pack dotnet/Orblit.Physics -c Release -o "${{ runner.temp }}/feed" --nologo -v q
+          dotnet pack dotnet/Orblit.Physics.Soft -c Release -o "${{ runner.temp }}/feed" --nologo -v q
 
-      - name: Link local checkouts
+      - name: Check
+        shell: bash
         working-directory: orblit-examples
-        run: ./tool/link_local.sh ../orblit ../orblit-net ../orblit-script ../orblit-physics
-
-      # Analyzed and tested here rather than in the job above, which runs on
-      # Linux and cannot resolve this app's renderer dependency at all. A
-      # build alone does not read test/, so a broken test sat here unnoticed.
-      - name: Check the viewport
-        working-directory: orblit-examples/viewport
-        run: flutter analyze && flutter test
-
-      - name: Build the viewport
-        working-directory: orblit-examples/viewport
-        run: flutter build macos --debug
-
-      # No frame smoke here. The engine's own CI builds this same viewport
-      # and waits for its first frame, so running it again would check the
-      # same thing twice — and it would do so by calling a script out of the
-      # engine repository's default branch, which is a dependency on a file
-      # this repository's pull requests cannot change. That coupling has
-      # already broken this job once.
-      #
-      # What is this repository's business is that its apps build.
-
-      - name: Check the gallery
-        working-directory: orblit-examples/gallery
-        run: flutter analyze && flutter test
-
-      - name: Build the gallery
-        working-directory: orblit-examples/gallery
-        run: flutter build macos --debug
+        env:
+          ORBLIT_FEED: ${{ runner.temp }}/feed
+        run: tool/check_dotnet.sh
 
   # Checks each commit on a pull request against commitlint.config.mjs.
   # Pull requests only, since a push to main has no range to check. It

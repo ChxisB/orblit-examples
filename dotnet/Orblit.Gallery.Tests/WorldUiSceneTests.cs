@@ -8,8 +8,8 @@ namespace Orblit.Gallery.Tests;
 
 /// <summary>
 /// The scene of the interface in the world, with a screen that is a stand-in and so needs no window.
-/// Before the first picture it is the scene the Dart example sent, frame for frame. After, it is what
-/// this port sends, pinned here.
+/// Before the first picture it is the recorded scene in <c>fixtures/world_ui.json</c>, frame for frame.
+/// After, it is what this example sends, pinned here.
 /// </summary>
 public sealed class WorldUiSceneTests
 {
@@ -54,7 +54,7 @@ public sealed class WorldUiSceneTests
     {
         using var example = Mounted(new RecordedPictures());
 
-        // As the Dart exporter moves a control: a slider to the far end it is not at, a switch to the other side.
+        // As the fixture was recorded: a slider to the far end it is not at, a switch to the other side.
         switch (example.Settings()[control])
         {
             case Setting slider:

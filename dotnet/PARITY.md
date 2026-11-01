@@ -9,6 +9,8 @@ counts the C# tests that carry a Dart test over. Added in C# counts tests with
 no Dart twin. A file is done when C# ported equals Dart run, less the tests a
 decision drops.
 
+The Dart is deleted. The tag `dart-final` holds the last Dart commit.
+
 The rules are the engine's `dotnet/PORTING.md`, in the `orblit` repository. The
 engine packages come from a folder. The engine's `tool/pack_local.sh` packs
 them, into `~/.orblit/feed` unless `ORBLIT_FEED` names another.

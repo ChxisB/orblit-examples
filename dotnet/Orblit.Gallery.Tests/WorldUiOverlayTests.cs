@@ -12,8 +12,7 @@ namespace Orblit.Gallery.Tests;
 
 /// <summary>
 /// The screen on the wall, pressed through the stage as somebody would press it: a click on the button, a
-/// drag along the slider, a press beside the screen that is left for the camera. The Dart drew this in
-/// widgets and its tests moved them with a fake finger.
+/// drag along the slider, a press beside the screen that is left for the camera.
 /// </summary>
 public sealed class WorldUiOverlayTests
 {
