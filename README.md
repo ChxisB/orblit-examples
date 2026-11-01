@@ -9,6 +9,7 @@ The examples are C# on Avalonia. You need the .NET 10 SDK.
 ```sh
 # Clone orblit, orblit-net and orblit-physics beside this one, then fill the
 # local feed the packages restore from:
+orblit/tool/build_native.sh
 orblit/tool/pack_local.sh
 dotnet pack orblit-net/dotnet/Orblit.Net -c Release -o ~/.orblit/feed
 orblit-physics/tool/build_native.sh
