@@ -12,10 +12,10 @@ concurrency:
 
 jobs:
   # The packages come from three other repositories, which CI packs into a
-  # local feed. The engine branch with this branch's name is the pair when
-  # there is one, so a change here and the engine change it needs build
-  # together. Without one it uses the engine's default branch. The renderer
-  # runs on macOS so far, so tests that need it skip elsewhere.
+  # local feed. A branch with this branch's name in one of them is its pair,
+  # so a change here and the change it needs build together. Without one the
+  # repository's default branch is used. The renderer runs on macOS so far,
+  # so tests that need it skip elsewhere.
   dotnet:
     name: .NET (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -29,34 +29,40 @@ jobs:
         with:
           path: orblit-examples
 
-      - id: engine
+      - id: pair
         shell: bash
+        env:
+          BRANCH: ${{ github.head_ref || github.ref_name }}
         run: |
-          branch="${{ github.head_ref || github.ref_name }}"
-          if git ls-remote --exit-code --heads \
-              https://github.com/ChxisB/orblit.git "$branch" > /dev/null; then
-            echo "Building against ChxisB/orblit@$branch"
-            echo "ref=$branch" >> "$GITHUB_OUTPUT"
-          else
-            echo "No matching engine branch; using its default"
-            echo "ref=" >> "$GITHUB_OUTPUT"
-          fi
+          for repo in orblit orblit-net orblit-physics; do
+            key=${repo//-/_}
+            if git ls-remote --exit-code --heads \
+                "https://github.com/ChxisB/$repo.git" "$BRANCH" > /dev/null; then
+              echo "Building against ChxisB/$repo@$BRANCH"
+              echo "$key=$BRANCH" >> "$GITHUB_OUTPUT"
+            else
+              echo "No matching $repo branch; using its default"
+              echo "$key=" >> "$GITHUB_OUTPUT"
+            fi
+          done
 
       # No token: these repositories are public, so the default GITHUB_TOKEN
       # reads them. Nothing here needs a secret.
       - uses: actions/checkout@v4
         with:
           repository: ChxisB/orblit
-          ref: ${{ steps.engine.outputs.ref }}
+          ref: ${{ steps.pair.outputs.orblit }}
           path: orblit
       - uses: actions/checkout@v4
         with:
           repository: ChxisB/orblit-net
+          ref: ${{ steps.pair.outputs.orblit_net }}
           path: orblit-net
       # The gallery's cloth moves with the physics repository's solver.
       - uses: actions/checkout@v4
         with:
           repository: ChxisB/orblit-physics
+          ref: ${{ steps.pair.outputs.orblit_physics }}
           path: orblit-physics
 
       - uses: actions/setup-dotnet@v4
