@@ -10,4 +10,7 @@
     <PackageReference Include="Orblit.HeadlessSupport" />
     <ProjectReference Include="..\Orblit.Gallery\Orblit.Gallery.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="fixtures\*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

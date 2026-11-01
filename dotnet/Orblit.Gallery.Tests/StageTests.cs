@@ -5,12 +5,15 @@ using Avalonia.VisualTree;
 using Orblit.Examples;
 using Orblit.Filament;
 using Orblit.Interop;
+using Orblit.Stage.Avalonia;
 
 namespace Orblit.Gallery.Tests;
 
 /// <summary>What the renderer reports back to the example on show, and what the stage draws over it.</summary>
 public sealed class StageTests
 {
+    private static PanelHost NoPanels() => throw new InvalidOperationException("An overlay opens its panel when the stage shows it, not when it is made.");
+
     private const string Fox = """
         {"clips":[{"name":"Survey","seconds":3.41666675}],"skins":[],"variants":[],"materials":[],
         "lights":[],"cameras":[],"bounds":{"min":[-8,0,-60],"max":[8,80,70]},"unsupported":[]}
@@ -45,13 +48,13 @@ public sealed class StageTests
     }
 
     [Fact]
-    public Task OnlyTheCamerasTheBenchmarkTheBlocksTheRunnerAndTheInterfaceDrawOverTheirScene() => Headless.Run(() =>
+    public Task OnlyTheCamerasTheBenchmarkTheBlocksTheRunnerAndTheInterfacesDrawOverTheirScene() => Headless.Run(() =>
     {
         var drawn = Gallery.Examples()
-            .Select(example => (example.Name, StageView.OverlayFor(example, () => 0)?.GetType().Name))
+            .Select(example => (example.Name, StageView.OverlayFor(example, () => 0, NoPanels, () => example.ViewPoint.ToRenderCamera())?.GetType().Name))
             .Where(pair => pair.Item2 is not null);
 
-        Assert.Equal([("Virtual cameras", "FramingOverlay"), ("Benchmark", "Readout"), ("Blocks", "WalkOverlay"), ("Runner", "RunnerOverlay"), ("An interface in C#", "NativeInterfaceOverlay")], drawn);
+        Assert.Equal([("Virtual cameras", "FramingOverlay"), ("Benchmark", "Readout"), ("Blocks", "WalkOverlay"), ("Runner", "RunnerOverlay"), ("An interface in C#", "NativeInterfaceOverlay"), ("Interface in the world", "WorldUiOverlay")], drawn);
     });
 
     [Fact]

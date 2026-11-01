@@ -6,6 +6,7 @@ using Avalonia.Media;
 using Orblit.Examples;
 using Orblit.Filament;
 using Orblit.Filament.Avalonia;
+using Orblit.Stage.Avalonia;
 
 namespace Orblit.Gallery;
 
@@ -22,6 +23,9 @@ internal sealed class StageView : Border
     private string? _heard;
     private double _facing;
     private Point? _dragging;
+
+    // Made when an example needs it, because the window it holds is one nobody asked for otherwise.
+    private PanelHost? _panels;
 
     /// <param name="showing">The example to show first.</param>
     /// <param name="renderer">Whether to draw with the renderer, which runs on macOS so far.</param>
@@ -123,14 +127,18 @@ internal sealed class StageView : Border
         }
     }
 
-    /// <summary>What <paramref name="example"/> draws over its scene, if anything.</summary>
-    internal static Control? OverlayFor(Example example, Func<double> gpuMilliseconds) => example switch
+    /// <summary>
+    /// What <paramref name="example"/> draws over its scene, if anything. <paramref name="panels"/> opens the
+    /// window an example draws controls in, and <paramref name="camera"/> is where the scene is seen from.
+    /// </summary>
+    internal static Control? OverlayFor(Example example, Func<double> gpuMilliseconds, Func<PanelHost> panels, Func<RenderCamera> camera) => example switch
     {
         CamerasExample cameras => new FramingOverlay(cameras),
         VoxelExample voxels => new WalkOverlay(voxels),
         BenchmarkExample benchmark => new Readout(benchmark, gpuMilliseconds),
         NativeInterfaceExample native => new NativeInterfaceOverlay(native),
         RunnerExample runner => new RunnerOverlay(runner),
+        WorldUiExample world => new WorldUiOverlay(world, panels, camera),
         _ => null,
     };
 
@@ -141,7 +149,7 @@ internal sealed class StageView : Border
     private void Layer(Example example)
     {
         _layers.Children.RemoveRange(1, _layers.Children.Count - 1);
-        if (OverlayFor(example, GpuMilliseconds) is { } overlay)
+        if (OverlayFor(example, GpuMilliseconds, Panels, () => View.ToRenderCamera()) is { } overlay)
         {
             _layers.Children.Add(overlay);
         }
@@ -149,7 +157,16 @@ internal sealed class StageView : Border
         _layers.Children.Add(new NoteCard(example));
     }
 
+    private PanelHost Panels() => _panels ??= new PanelHost();
+
     private double GpuMilliseconds() => _renderer?.Renderer?.GetStats().GpuMilliseconds ?? 0;
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        _panels?.Dispose();
+        _panels = null;
+    }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
