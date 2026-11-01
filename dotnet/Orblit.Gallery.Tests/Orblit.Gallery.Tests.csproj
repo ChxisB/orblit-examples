@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsTestProject>true</IsTestProject>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Using Include="Orblit.HeadlessSupport" />
+    <PackageReference Include="Avalonia.Headless" />
+    <PackageReference Include="Orblit.HeadlessSupport" />
+    <ProjectReference Include="..\Orblit.Gallery\Orblit.Gallery.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="fixtures\*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

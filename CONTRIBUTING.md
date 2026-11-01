@@ -13,12 +13,11 @@ the longer version of this.
 ## Checking your work
 
 ```sh
-./tool/link_local.sh   # point the examples at a local orblit checkout
-./tool/check.sh
+./tool/check_dotnet.sh
 ```
 
-Re-run the platform setup after new `.mat` files land, or the examples will
-pick up stale materials.
+It builds, runs the tests and checks the format. The README says how to put
+the engine packages in `~/.orblit/feed` first.
 
 ## Licence
 

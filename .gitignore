@@ -1,20 +1,7 @@
 .DS_Store
-.dart_tool/
-.packages
-build/
-pubspec.lock
 *.iml
 
-# Written by tool/link_local.sh for working against sibling checkouts.
-pubspec_overrides.yaml
-
-# Flutter, per platform
-**/macos/Pods/
-**/macos/Podfile.lock
-**/macos/Flutter/ephemeral/
-**/macos/Flutter/GeneratedPluginRegistrant.swift
-
-# The TypeScript toolchain. Needed to change the script in gallery/script,
-# not to run the examples — what they load is checked in.
-node_modules/
-gallery/script/build/
+# .NET build output
+dotnet/**/bin/
+dotnet/**/obj/
+dotnet/**/TestResults/

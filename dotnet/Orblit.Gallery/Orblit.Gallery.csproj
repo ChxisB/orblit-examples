@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <Version>0.1.0</Version>
+    <IsPackable>false</IsPackable>
+    <Description>The examples gallery: every example the engine ships, and the gallery's own, listed with their settings and code.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <PackageReference Include="Orblit.Examples" />
+    <PackageReference Include="Orblit.Filament.Avalonia" />
+    <PackageReference Include="Orblit.Physics.Soft" />
+    <PackageReference Include="Orblit.Stage" />
+    <PackageReference Include="Orblit.Stage.Avalonia" />
+    <PackageReference Include="Orblit.Ui.Avalonia" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Orblit.Gallery.Tests" />
+  </ItemGroup>
+</Project>

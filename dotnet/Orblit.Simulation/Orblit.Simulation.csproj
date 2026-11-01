@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <Version>0.1.0</Version>
+    <IsPackable>false</IsPackable>
+    <Description>The engine with no window: storage, the transform hierarchy, a system over columns, and replication of the result.</Description>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Orblit.Codegen" PrivateAssets="all" />
+    <PackageReference Include="Orblit.Core" />
+    <PackageReference Include="Orblit.Net" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Orblit.Simulation.Tests" />
+  </ItemGroup>
+</Project>
