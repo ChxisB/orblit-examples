@@ -96,6 +96,12 @@
           "colour": "#D9634F",
           "castShadows": true,
           "receiveShadows": true
+        },
+        "net": {
+          "authority": "owner",
+          "sync": [
+            "transform"
+          ]
         }
       }
     },
@@ -124,6 +130,12 @@
           "colour": "#E5B84F",
           "castShadows": true,
           "receiveShadows": true
+        },
+        "net": {
+          "authority": "server",
+          "sync": [
+            "transform"
+          ]
         }
       }
     },

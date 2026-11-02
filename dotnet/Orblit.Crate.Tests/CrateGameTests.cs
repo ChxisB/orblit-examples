@@ -50,6 +50,14 @@ public sealed class CrateGameTests
     }
 
     [Fact]
+    public void PlayingOfflineAddsNoSecondCrate()
+    {
+        var host = Started();
+
+        Assert.Null(host.Scene["crate2"]);
+    }
+
+    [Fact]
     public void StartingChangesNothingInTheScene()
     {
         var scene = Authored();
@@ -388,6 +396,21 @@ public sealed class CrateGameTests
 
         Assert.Equal(-2, Transform(host, "crate").Position.X, 9);
         Assert.Equal(2, Transform(host, "crate").Position.Z, 9);
+    }
+
+    [Fact]
+    public void AClickPlacesTheMarkerOnceAndAnEditToItAfterwardsStands()
+    {
+        var host = Started();
+        Frame(host, 0.25, Click(new Vector3(2.3, 5, -1.2), new Vector3(0, -1, 0)));
+        var marker = host.Scene["marker"]!;
+        var dragged = marker.WithComponent(SceneComponents.Transform, new TransformComponent(new Vector3(-4.5, 0.02, 3.5)));
+        host.ApplyEdit(SceneDiff.Between(host.Scene, host.Scene.WithEntity("marker", dragged)));
+
+        Frame(host, 0.25);
+
+        Assert.Equal(-4.5, Transform(host, "marker").Position.X, 9);
+        Assert.Equal(3.5, Transform(host, "marker").Position.Z, 9);
     }
 
     [Fact]
