@@ -30,8 +30,10 @@ public sealed class CrateGameTests
     private static void Frame(GameHost host, double seconds, GamePointer pointer) =>
         host.Update(new GameInput(new FrameControls(), pointer), seconds);
 
-    private static TransformComponent Transform(GameHost host, string id) =>
-        (TransformComponent)host.Scene[id]![SceneComponents.Transform]!;
+    private static TransformComponent Transform(GameHost host, string id) => TransformOf(host.Scene[id]!);
+
+    private static TransformComponent TransformOf(SceneEntity entity) =>
+        (TransformComponent)entity[SceneComponents.Transform]!;
 
     private static GamePointer Click(Vector3 origin, Vector3 direction) => new(origin, direction, Pressed: true);
 
@@ -54,6 +56,27 @@ public sealed class CrateGameTests
         var host = Started(scene);
 
         Assert.Equal(scene.Encode(), host.Scene.Encode());
+    }
+
+    // A mesh with no asset is the renderer's cube, which is 2 across, so a scale is half a size. The
+    // game keeps the crate on a ground 12 metres square, and the scene has to draw that ground.
+    [Fact]
+    public void TheDrawnGroundIsTheTwelveMetresTheGameKeepsTheCrateOn()
+    {
+        var ground = TransformOf(Authored()["ground"]!).Scale;
+
+        Assert.Equal(12, ground.X * 2);
+        Assert.Equal(12, ground.Z * 2);
+    }
+
+    [Fact]
+    public void TheCrateStandsOnTheTopOfTheGround()
+    {
+        var scene = Authored();
+        var ground = TransformOf(scene["ground"]!);
+        var crate = TransformOf(scene["crate"]!);
+
+        Assert.Equal(ground.Position.Y + ground.Scale.Y, crate.Position.Y - crate.Scale.Y, 9);
     }
 
     [Fact]
