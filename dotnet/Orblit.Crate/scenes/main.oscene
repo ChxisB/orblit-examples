@@ -105,9 +105,9 @@
       "components": {
         "transform": {
           "position": [
-            0.0,
+            -2.5,
             0.02,
-            0.0
+            -2.5
           ],
           "rotation": [
             0.0,
