@@ -22,14 +22,33 @@ dotnet pack orblit-physics/dotnet/Orblit.Physics.Soft -c Release -o ~/.orblit/fe
 | [`Orblit.Gallery`](dotnet/Orblit.Gallery) | Every rendering technique, one at a time: pick from the list, change it with the settings, and read the lines that do it. macOS. |
 | [`Orblit.Viewport`](dotnet/Orblit.Viewport) | A Filament scene drawn as an ordinary Avalonia control. It lays out, it clips, and it sits beside a panel that resizes it. macOS. |
 | [`Orblit.Simulation`](dotnet/Orblit.Simulation) | The engine with no window: an entity-component world, a transform hierarchy, a system written over column views, and the result replicated to a second world. |
+| [`Orblit.Crate`](dotnet/Orblit.Crate) | A game as a project: one scene and one `IGame` class. The editor builds it and plays it, and `dotnet run` plays the same class in a window of its own. |
 
 ```sh
 dotnet run --project dotnet/Orblit.Gallery -c Release
 dotnet run --project dotnet/Orblit.Viewport -c Release
 dotnet run --project dotnet/Orblit.Simulation -c Release
+dotnet run --project dotnet/Orblit.Crate -c Release
 ```
 
 `./tool/check_dotnet.sh` builds, tests and checks the format.
+
+## The crate
+
+`Orblit.Crate` is laid out the way the editor expects a game project to be.
+`scenes/main.oscene` holds the objects. `game/CrateGame.cs` is the one
+`IGame` class, and `orblit.project.json` names it. The arrow keys move the
+crate, it turns on its own, and a click puts the marker on the tile under the
+pointer.
+
+Open the `dotnet/Orblit.Crate` folder in the editor and press Play. The editor
+asks once whether to trust the project, because building it runs its code. It
+then builds `game/Game.csproj` and runs the class on a copy of the scene.
+
+The game keeps nothing but the camera's distance from the crate. Everything
+else is read from the scene each frame, so a change made in the editor while it
+plays shows up on the next frame. `Orblit.Crate.Tests` plays the game under a
+host with no window and says what one frame of input does.
 
 ## The gallery
 

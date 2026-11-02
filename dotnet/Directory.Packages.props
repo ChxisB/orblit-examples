@@ -12,17 +12,19 @@
     <PackageVersion Include="xunit.v3" Version="4.0.2" />
   </ItemGroup>
 
-  <!-- The Orblit packages are the versions the engine had on 2026-10-29. -->
+  <!-- The Orblit packages are the versions that restored together from the local feed on 2026-11-02. -->
   <ItemGroup>
     <PackageVersion Include="Orblit.Codegen" Version="0.1.0" />
     <PackageVersion Include="Orblit.Core" Version="0.1.0" />
     <PackageVersion Include="Orblit.Examples" Version="0.4.0" />
     <PackageVersion Include="Orblit.Filament.Avalonia" Version="0.1.0" />
+    <PackageVersion Include="Orblit.Game" Version="0.1.0" />
+    <PackageVersion Include="Orblit.Game.Avalonia" Version="0.1.0" />
     <PackageVersion Include="Orblit.HeadlessSupport" Version="0.1.0" />
     <PackageVersion Include="Orblit.Net" Version="0.10.0" />
     <PackageVersion Include="Orblit.Physics.Soft" Version="0.2.0" />
-    <PackageVersion Include="Orblit.Stage" Version="0.5.0" />
+    <PackageVersion Include="Orblit.Stage" Version="0.6.0" />
     <PackageVersion Include="Orblit.Stage.Avalonia" Version="0.2.0" />
-    <PackageVersion Include="Orblit.Ui.Avalonia" Version="0.3.0" />
+    <PackageVersion Include="Orblit.Ui.Avalonia" Version="0.4.0" />
   </ItemGroup>
 </Project>

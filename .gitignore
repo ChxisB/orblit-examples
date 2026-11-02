@@ -5,3 +5,6 @@
 dotnet/**/bin/
 dotnet/**/obj/
 dotnet/**/TestResults/
+
+# A game built by the editor
+dotnet/**/.orblit/

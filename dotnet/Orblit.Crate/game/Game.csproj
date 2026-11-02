@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- The editor builds this project with its own command and loads Game.dll, so the assembly keeps this name. -->
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <Description>A crate on a ground plane. The arrow keys move it and a click moves a marker.</Description>
+    <!-- IGame names its method Stop, and a game that implements it meets the rule the contract already answers. -->
+    <NoWarn>$(NoWarn);CA1716</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Orblit.Game" />
+  </ItemGroup>
+</Project>

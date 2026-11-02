@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <IsTestProject>true</IsTestProject>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Orblit.Crate\game\Game.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- The tests read the files the editor would open, so they run against the project as it is committed. -->
+    <None Include="..\Orblit.Crate\scenes\main.oscene" Link="scenes\main.oscene" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Orblit.Crate\orblit.project.json" Link="orblit.project.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\Orblit.Crate\game\Game.csproj" Link="game\Game.csproj" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

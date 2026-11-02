@@ -1,0 +1,159 @@
+{
+  "formatVersion": 5,
+  "name": "Crate",
+  "sky": "#1A2029",
+  "ambient": 28000.0,
+  "time": {
+    "hour": 10.0,
+    "cycle": false,
+    "hoursPerSecond": 0.5
+  },
+  "entities": [
+    {
+      "id": "sun",
+      "name": "Sun",
+      "components": {
+        "transform": {
+          "position": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            -55.0,
+            35.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "light": {
+          "kind": "sun",
+          "power": 1400.0,
+          "colour": "#FFF3E0",
+          "spotSize": 45.0,
+          "spotBlend": 0.15,
+          "sourceRadius": 0.1,
+          "sunAngle": 0.526,
+          "body": "sun",
+          "castShadows": true
+        }
+      }
+    },
+    {
+      "id": "ground",
+      "name": "Ground",
+      "components": {
+        "transform": {
+          "position": [
+            0.0,
+            -0.05,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            12.0,
+            0.1,
+            12.0
+          ]
+        },
+        "mesh": {
+          "colour": "#3B424C",
+          "castShadows": true,
+          "receiveShadows": true
+        }
+      }
+    },
+    {
+      "id": "crate",
+      "name": "Crate",
+      "components": {
+        "transform": {
+          "position": [
+            0.0,
+            0.5,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "mesh": {
+          "colour": "#D9634F",
+          "castShadows": true,
+          "receiveShadows": true
+        }
+      }
+    },
+    {
+      "id": "marker",
+      "name": "Marker",
+      "components": {
+        "transform": {
+          "position": [
+            0.0,
+            0.02,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            0.8,
+            0.04,
+            0.8
+          ]
+        },
+        "mesh": {
+          "colour": "#E5B84F",
+          "castShadows": true,
+          "receiveShadows": true
+        }
+      }
+    },
+    {
+      "id": "camera",
+      "name": "Camera",
+      "components": {
+        "transform": {
+          "position": [
+            0.0,
+            8.0,
+            8.0
+          ],
+          "rotation": [
+            -45.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "camera": {
+          "fieldOfView": 50.0,
+          "near": 0.1,
+          "far": 1000.0
+        }
+      }
+    }
+  ]
+}
