@@ -1,0 +1,10 @@
+{
+  "formatVersion": 1,
+  "name": "Crate",
+  "engine": "0.1.0",
+  "lastOpened": "2026-11-02T00:00:00.000Z",
+  "game": {
+    "project": "game/Game.csproj",
+    "type": "Crate.CrateGame"
+  }
+}
