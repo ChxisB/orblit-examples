@@ -18,10 +18,11 @@
     <PackageVersion Include="Orblit.Core" Version="0.1.0" />
     <PackageVersion Include="Orblit.Examples" Version="0.4.0" />
     <PackageVersion Include="Orblit.Filament.Avalonia" Version="0.1.0" />
-    <PackageVersion Include="Orblit.Game" Version="0.1.0" />
+    <PackageVersion Include="Orblit.Game" Version="0.2.0" />
     <PackageVersion Include="Orblit.Game.Avalonia" Version="0.1.0" />
     <PackageVersion Include="Orblit.HeadlessSupport" Version="0.1.0" />
     <PackageVersion Include="Orblit.Net" Version="0.10.0" />
+    <PackageVersion Include="Orblit.Net.Game" Version="0.1.0" />
     <PackageVersion Include="Orblit.Physics.Soft" Version="0.2.1" />
     <PackageVersion Include="Orblit.Stage" Version="0.6.0" />
     <PackageVersion Include="Orblit.Stage.Avalonia" Version="0.2.0" />

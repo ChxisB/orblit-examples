@@ -90,7 +90,9 @@ jobs:
         working-directory: orblit-net
         env:
           ORBLIT_FEED: ${{ runner.temp }}/feed
-        run: dotnet pack dotnet/Orblit.Net -c Release -o "${{ runner.temp }}/feed" --nologo -v q
+        run: |
+          dotnet pack dotnet/Orblit.Net -c Release -o "${{ runner.temp }}/feed" --nologo -v q
+          dotnet pack dotnet/Orblit.Net.Game -c Release -o "${{ runner.temp }}/feed" --nologo -v q
 
       - name: Pack physics
         shell: bash

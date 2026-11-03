@@ -8,5 +8,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Orblit.Game" />
+    <PackageReference Include="Orblit.Net.Game" />
   </ItemGroup>
 </Project>
